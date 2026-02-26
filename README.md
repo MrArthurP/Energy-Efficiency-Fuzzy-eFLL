@@ -5,6 +5,6 @@
 - [ ] Relizar simulação em circuito aproximado em algum programa adequado.
 - [ ] Transformar a análise de dados (toda a análise) em uma média de 3 conjunto de dados adquiridos (dados 1, 2 e 3)
 - [ ] Finalizar as anotações no JupterNotebook
-
+- [ ] Verificar necessidade de função acima de "Regras Redundantes"
 
 
