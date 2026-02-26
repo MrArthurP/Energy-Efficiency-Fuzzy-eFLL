@@ -20,41 +20,42 @@ Fuzzy *fuzzy = new Fuzzy();
 
 // Conjuntos fuzzy relacionados à bateria
 // Bateria reserva: 0% a 5% 
-FuzzySet *Breserva = new FuzzySet(0, 0, 15, 20);
+FuzzySet *Breserva = new FuzzySet(0,0,15,25);
 // Bateria extremamente_baixa: 5% a 20%
-FuzzySet *Bextremamente_baixa = new FuzzySet(10, 15, 30, 35);
+FuzzySet *Bextremamente_baixa = new FuzzySet(15,25,25,round((50+30)/2));
 // Bateria baixa: 15% a 45%
-FuzzySet *Bbaixa = new FuzzySet(25, 30, 50, 55);
+FuzzySet *Bbaixa = new FuzzySet(25,round((50+30)/2),round((50+30)/2),round((75+40)/2));
 // Bateria media: 35% a 70%
-FuzzySet *Bmedia = new FuzzySet(45, 50, 75, 80);
+FuzzySet *Bmedia = new FuzzySet(round((50+30)/2),round((75+40)/2),round((75+40)/2),75);
 // Bateria alta: 60% a 100%
-FuzzySet *Balta = new FuzzySet(70, 75, 100, 100);
+FuzzySet *Balta = new FuzzySet(round((75+40)/2),75,100,100);
 
 // Conjuntos fuzzy relacionados à taxa de acerto no envio de dados do GPRS
 
 // O GPRS tem uma taxa de acerto que pode variar de 0 a 1 (ou 0% a 100%), e isso influencia na decisão de ligar ou não o GPRS para economizar energia. A taxa é enviada pelo satélite, identificada por nome específico dos dados enviados, além de longitude e latitude.
 
-int norm_q (float valor){
-  return round(map(valor, 0, 31, 0, 100));
+float norm_q (float valor){
+  return map(valor, 0, 31, 0, 100);
 };
 
-// Taxa baixíssima: 0% a 20%
-FuzzySet *Qmuitobaixa = new FuzzySet(0, 0, norm_q(9), norm_q(12));
-// Taxa baixa: 10% a 50%
-FuzzySet *Qbaixa = new FuzzySet(norm_q(9), norm_q(11), norm_q(14), norm_q(16));
-// Taxa aceitável: 40% a 80%
-FuzzySet *Qalta = new FuzzySet(norm_q(14), norm_q(16), norm_q(19), norm_q(21));
-// Taxa alta: 70% a 100%
-FuzzySet *Qmuitoalta = new FuzzySet(norm_q(19), norm_q(21), 100, 100);
+
+// Taxa baixíssima: 0 a 9
+FuzzySet *Qmuitobaixa = new FuzzySet(0, 0, norm_q(9), norm_q((10+14)/2));
+// Taxa baixa: 10 a 14
+FuzzySet *Qbaixa = new FuzzySet(norm_q(9), norm_q((10+14)/2), norm_q((10+14)/2), norm_q((15+19)/2));
+// Taxa aceitável: 15 a 19
+FuzzySet *Qalta = new FuzzySet(norm_q((10+14)/2), norm_q((15+19)/2), norm_q((15+19)/2), norm_q((20+31)/2));
+// Taxa alta: 20 a 31
+FuzzySet *Qmuitoalta = new FuzzySet(norm_q((15+19)/2), norm_q((20+31)/2), 100, 100);
 
 // Conjuntos fuzzy relacionados à decisão de ligar ou não o GPRS
 
 // Esse conjunto representa a função fuzzy de saída, que será usado para a classificação final da decisão de ligar ou não o GPRS. O valor de saída é uma porcentagem que indica a pertinência da decisão de ligar o GPRS, onde 0% significa "não ligar" e 100% significa "ligar".
 
 // Liga: 0 a 100, com pico em 33,3 a 66,6.
-FuzzySet *Liga = new FuzzySet(0, (1/3)*100, (1/3)*100, (2/3)*100);
+FuzzySet *NaoLiga = new FuzzySet(0, 0, 20, 80);
 // Não liga: 33,3 a 100, com pico em 66,6 a 100.
-FuzzySet *NaoLiga = new FuzzySet((1/3)*100, (2/3)*100, (2/3)*100, (3/3)*100+1);
+FuzzySet *Liga = new FuzzySet(20, 80, 100, 100);
 
 // o valor de saída será um valor entre 0 e 100, que posteriormente poderá ser normalizado para uma classificação binária (0 ou 1). O valor ideal (treashold) é calculado usando o método de defuzzificação, que leva em consideração as pertinências dos conjuntos fuzzy de saída para determinar um valor final.
 
@@ -169,7 +170,7 @@ void setup() {
 FuzzyRuleAntecedent *regras1_1 = new FuzzyRuleAntecedent();
 regras1_1->joinWithAND(Breserva, Qmuitoalta);
 FuzzyRuleConsequent *saida_regra1_1 = new FuzzyRuleConsequent();
-saida_regra1_1->addOutput(NaoLiga);
+saida_regra1_1->addOutput(Liga);
 FuzzyRule *regra1_1 = new FuzzyRule(1, regras1_1, saida_regra1_1);
 fuzzy->addFuzzyRule(regra1_1);
 
@@ -323,19 +324,28 @@ void loop() {
   
   // Gera 300 valores decrescentes entre 100 e 0
   if (contador < 300) {
+
+    // definindo o contador
     float passo = 100.0 / 299.0;
 
+    // definindo a simulação da bateria decaindo com o tempo
     float input1 = 100.0 - (contador * passo);
-    int input2 = random(0, 31);  // mantém aleatório
 
+    // definindo simulação de entrada de Qualidade de Sinal
+    int input2 = random(0, 31);  // mantém aleatório
+    
     if (input2 == 99) {
       input2 = 0; // Informa que, para valor de RSSI igual a 99, a qualidade do sinal é equivalente a 0.
     };
 
+    // normalizando a entrada de qualidade de sinal de 0-31 para 0-100
+    input2 = norm_q(input2);
+
+    // Variável de saída de classificação 
     int out_class = 0;
 
     fuzzy->setInput(1, input1); // Bateria
-    fuzzy->setInput(2, input2); // Taxa de acerto
+    fuzzy->setInput(2, input2); // Qualidade de Sinal
 
     fuzzy->fuzzify();
 
