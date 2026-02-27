@@ -351,10 +351,10 @@ void loop() {
 
     float output1 = fuzzy->defuzzify(1);
 
-    if (Liga->getPertinence() > NaoLiga->getPertinence()){
+    if (output1 => 50){
       out_class = 1;
     }
-    else{
+    else if (output1 < 50){
       out_class = 0;
     }
 
