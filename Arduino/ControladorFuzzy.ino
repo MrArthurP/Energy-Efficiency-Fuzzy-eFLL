@@ -351,9 +351,11 @@ void loop() {
 
     float output1 = fuzzy->defuzzify(1);
 
+    // treashold = 50
     if (output1 => 50){
       out_class = 1;
     }
+    
     else if (output1 < 50){
       out_class = 0;
     }
