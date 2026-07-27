@@ -1,2 +1,30 @@
 # Ambiente virtual
 .venv/
+
+# Compilação e Artefatos do CMake / Ninja
+build/
+.cmake/
+CMakeCache.txt
+CMakeFiles/
+CMakePresets.json.user
+
+# Arquivos locais e caches do VS Code
+.vscode/ipch/
+.vscode/.cmaketools/
+.vscode/compile_commands.json
+
+# Se quiser salvar suas configurações de ambiente, ignore apenas os dados locais:
+# .vscode/launch.json (mantenha se quiser compartilhar a config do gravador/debugger)
+# .vscode/tasks.json
+
+# Arquivos gerados pelo compilador ARM
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.d
+*.su
+
+# Arquivos temporários do sistema ou do CubeMX
+*.backup
