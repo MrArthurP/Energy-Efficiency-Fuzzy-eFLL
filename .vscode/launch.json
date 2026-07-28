@@ -3,26 +3,5 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "stlinkgdbtarget",
-            "request": "launch",
-            "name": "STM32Cube: Launch ST-Link GDB Server",
-            "deviceName": "STM32F303RET",
-            "deviceCore": "Arm Cortex-M4",
-            "origin": "snippet",
-            "cwd": "${workspaceFolder}",
-            "preBuild": "${command:st-stm32-ide-debug-launch.build}",
-            "runEntry": "main",
-            "imagesAndSymbols": [
-                {
-                    "imageFileName": "${command:st-stm32-ide-debug-launch.get-projects-binary-from-context1}"
-                }
-            ],
-            "serverArgs": [
-                "-c", "connect_under_reset=0",
-                "-c", "reset_mode=software"
-            ]
-        }
-    ]
+    "configurations": []
 }

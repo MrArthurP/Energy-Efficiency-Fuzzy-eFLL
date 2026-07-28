@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Iniciar OpenOCD",
+            "type": "shell",
+            "command": "C:/arm-compiler/xpack-openocd-0.12.0-7/bin/openocd.exe",
+            "args": [
+                "-s", "C:/arm-compiler/xpack-openocd-0.12.0-7/openocd/scripts",
+                "-f", "interface/stlink.cfg",
+                "-f", "target/stm32f3x.cfg",
+                "-c", "gdb_port 50000"
+            ],
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^xPack Open On-Chip Debugger.*",
+                        "endsPattern": "^Info : Listening on port 50000 for gdb connections.*"
+                    }
+                }
+            ]
+        }
+    ]
+}

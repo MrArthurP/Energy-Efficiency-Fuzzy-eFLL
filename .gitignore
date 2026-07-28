@@ -1,6 +1,9 @@
 # Ambiente virtual
 .venv/
 
+# Pasta contendo passo a passo de processos e instalações específicas do projeto
+Processos/
+
 # Compilação e Artefatos do CMake / Ninja
 build/
 .cmake/
