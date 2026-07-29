@@ -148,4 +148,8 @@ Este arquivo inicia o OpenOCD em segundo plano via porta `50000`, evitando erros
 2. Pressione `Ctrl + Shift + P` e digite **CMake: Debug** para compilar o código, gravá-lo na memória flash e iniciar a sessão de depuração.
 3. **Para encerrar a depuração:** Clique no botão de parada (quadrado vermelho `[]`), retorne ao terminal e pressione `Ctrl + C` para fechar o processo do compilador/OpenOCD.
 
+# A fazer
+[] Escrever o que foi realizado no tópico de "Machine Learning (otimização do modelo), e explicar o que cada coisa faz"
+[] Comparar os modelos existentes (fuzzy, Regressão Logística e Árvore de Decisão) com um condicional básico no funcionamento do Stm32Nucleo e realizar a análise
+
 
