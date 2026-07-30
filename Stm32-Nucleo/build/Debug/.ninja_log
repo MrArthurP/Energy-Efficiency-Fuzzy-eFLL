@@ -19,7 +19,7 @@
 332	627	8068894561297204	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c.obj	65f8bedb0b6e0c63
 341	651	8068894561377583	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c.obj	a4b9558ff7712791
 326	745	8068894561237204	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c.obj	28eddad8f00f9bad
-2847	2958	8071438908752776	Stm32-Nucleo.elf	222cf0b1c20af0e1
+170	289	8071443458671010	Stm32-Nucleo.elf	1532e233b82c4245
 9	2847	8071438880367168	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/eFLL_wrapper.cpp.obj	fe02a7164e8b3122
 12	129	8071443457096232	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyIO.cpp.obj	d59490ca77250db0
 18	130	8071443457156246	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyInput.cpp.obj	b9ac4b8d03d3c8d3
@@ -30,4 +30,3 @@
 8	158	8071443457056520	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyComposition.cpp.obj	7fef2bc51ae57bfe
 35	166	8071443457326318	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyRuleAntecedent.cpp.obj	df54e323da09d484
 43	170	8071443457406341	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyRuleConsequent.cpp.obj	5b00eac9704b83da
-170	289	8071443458671010	Stm32-Nucleo.elf	1532e233b82c4245

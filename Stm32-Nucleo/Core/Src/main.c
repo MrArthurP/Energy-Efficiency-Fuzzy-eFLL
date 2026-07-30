@@ -88,11 +88,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
+
   fuzzy = Fuzzy_create();
   if (fuzzy == NULL)
   {
     Error_Handler();
   }
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
