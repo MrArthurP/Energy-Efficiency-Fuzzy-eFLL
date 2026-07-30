@@ -1,7 +1,8 @@
 // Controlador Fuzzy para ligar ou não o GPRS de um dispositivo baseado na carga da bateria e na taxa de consumo de energia
 
 // importando a biblioteca Fuzzy
-#include<Fuzzy.h>
+#include <Arduino.h>
+#include <Fuzzy.h>
 // definindo o pino de reset do Arduino para reiniciar o programa
 #define RESET asm ("jmp (0x0000)")
 
@@ -22,13 +23,13 @@ Fuzzy *fuzzy = new Fuzzy();
 // Bateria reserva: 0% a 5% 
 FuzzySet *Breserva = new FuzzySet(0,0,15,25);
 // Bateria extremamente_baixa: 5% a 20%
-FuzzySet *Bextremamente_baixa = new FuzzySet(15,25,25,round((50+30)/2));
+FuzzySet *Bextremamente_baixa = new FuzzySet(15,25,25,((50+30)/2));
 // Bateria baixa: 15% a 45%
-FuzzySet *Bbaixa = new FuzzySet(25,round((50+30)/2),round((50+30)/2),round((75+40)/2));
+FuzzySet *Bbaixa = new FuzzySet(25,((50+30)/2),((50+30)/2),((75+40)/2));
 // Bateria media: 35% a 70%
-FuzzySet *Bmedia = new FuzzySet(round((50+30)/2),round((75+40)/2),round((75+40)/2),75);
+FuzzySet *Bmedia = new FuzzySet(((50+30)/2),((75+40)/2),((75+40)/2),75);
 // Bateria alta: 60% a 100%
-FuzzySet *Balta = new FuzzySet(round((75+40)/2),75,100,100);
+FuzzySet *Balta = new FuzzySet(((75+40)/2),75,100,100);
 
 // Conjuntos fuzzy relacionados à taxa de acerto no envio de dados do GPRS
 
@@ -352,7 +353,7 @@ void loop() {
     float output1 = fuzzy->defuzzify(1);
 
     // treashold = 50
-    if (output1 => 50){
+    if (output1 >= 50){
       out_class = 1;
     }
     

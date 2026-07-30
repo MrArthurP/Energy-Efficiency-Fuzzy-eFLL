@@ -1,0 +1,27 @@
+# Build outputs
+build/
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.d
+*.su
+*.lst
+
+# CMake generated files
+.cmake/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# IDE / editor temporary files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Local STM32CubeMX / toolchain artifacts
+*.backup
