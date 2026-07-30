@@ -31,3 +31,18 @@ CMakePresets.json.user
 
 # Arquivos temporários do sistema ou do CubeMX
 *.backup
+
+# Ignore build artifacts from external libraries under Bibliotecas-Globais-C
+Bibliotecas-Globais-C/*/build/
+Bibliotecas-Globais-C/*/bin/
+Bibliotecas-Globais-C/*/*.o
+Bibliotecas-Globais-C/*/*.obj
+Bibliotecas-Globais-C/*/*.d
+Bibliotecas-Globais-C/*/*.elf
+Bibliotecas-Globais-C/*/*.hex
+Bibliotecas-Globais-C/*/*.map
+Bibliotecas-Globais-C/*/*.lib
+Bibliotecas-Globais-C/*/.vscode/
+Bibliotecas-Globais-C/*/.idea/
+Bibliotecas-Globais-C/*/*~
+Bibliotecas-Globais-C/*/#*#

@@ -1,10 +1,10 @@
 # ninja log v7
-14	202	8068894558113024	CMakeFiles/Stm32-Nucleo.dir/Core/Src/sysmem.c.obj	2a04392ad46665c2
-22	222	8068894558198219	CMakeFiles/Stm32-Nucleo.dir/startup_stm32f303xe.s.obj	131d769ba02b9f95
-18	233	8068894558153023	CMakeFiles/Stm32-Nucleo.dir/Core/Src/syscalls.c.obj	cbff2e52adbf954f
-10	326	8068894558083018	CMakeFiles/Stm32-Nucleo.dir/Core/Src/stm32f3xx_hal_msp.c.obj	5dad88677e4bccee
-6	332	8068894558042056	CMakeFiles/Stm32-Nucleo.dir/Core/Src/stm32f3xx_it.c.obj	55c1e3fd1bbad302
-1	341	8068894557982093	CMakeFiles/Stm32-Nucleo.dir/Core/Src/main.c.obj	94a8e8b4abf2068
+1274	7269	8071414982575806	CMakeFiles/Stm32-Nucleo.dir/Core/Src/sysmem.c.obj	a0bc08204f157755
+1285	7417	8071414982685834	CMakeFiles/Stm32-Nucleo.dir/startup_stm32f303xe.s.obj	1616a7dedd6260f8
+1280	7483	8071414982635801	CMakeFiles/Stm32-Nucleo.dir/Core/Src/syscalls.c.obj	c87f5508bcb05428
+1270	7427	8071414982525826	CMakeFiles/Stm32-Nucleo.dir/Core/Src/stm32f3xx_hal_msp.c.obj	ebf696898309e586
+1265	7483	8071414982480813	CMakeFiles/Stm32-Nucleo.dir/Core/Src/stm32f3xx_it.c.obj	89b56932403c5f41
+3	153	8071442933003501	CMakeFiles/Stm32-Nucleo.dir/Core/Src/main.c.obj	f3137c0d59f7e59e
 31	407	8068894558293318	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj	19f4b49734c3f962
 27	414	8068894558243334	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj	9a81e91bfe81637e
 53	418	8068894558503842	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c.obj	b20068ac2703f5b6
@@ -19,4 +19,15 @@
 332	627	8068894561297204	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c.obj	65f8bedb0b6e0c63
 341	651	8068894561377583	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c.obj	a4b9558ff7712791
 326	745	8068894561237204	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c.obj	28eddad8f00f9bad
-746	842	8068894565430555	Stm32-Nucleo.elf	87d10842868d885
+2847	2958	8071438908752776	Stm32-Nucleo.elf	222cf0b1c20af0e1
+9	2847	8071438880367168	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/eFLL_wrapper.cpp.obj	fe02a7164e8b3122
+12	129	8071443457096232	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyIO.cpp.obj	d59490ca77250db0
+18	130	8071443457156246	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyInput.cpp.obj	b9ac4b8d03d3c8d3
+2	141	8071443456997088	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/Fuzzy.cpp.obj	ed911d48a682b998
+28	151	8071443457256258	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyRule.cpp.obj	2c9d2ba0689292db
+49	153	8071443457471477	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzySet.cpp.obj	b0df467523e1931f
+23	156	8071443457206239	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyOutput.cpp.obj	5c3c52092583a5fc
+8	158	8071443457056520	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyComposition.cpp.obj	7fef2bc51ae57bfe
+35	166	8071443457326318	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyRuleAntecedent.cpp.obj	df54e323da09d484
+43	170	8071443457406341	CMakeFiles/Stm32-Nucleo.dir/D_/Projetos/Simulador-IA/Bibliotecas-Globais-C/eFLL/FuzzyRuleConsequent.cpp.obj	5b00eac9704b83da
+170	289	8071443458671010	Stm32-Nucleo.elf	1532e233b82c4245

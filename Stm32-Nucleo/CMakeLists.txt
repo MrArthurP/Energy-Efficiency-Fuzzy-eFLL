@@ -13,6 +13,11 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
 
 
+# Enable C++ support for libraries written in C++ (e.g. eFLL Fuzzy library)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+
 # Define the build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -25,13 +30,14 @@ set(CMAKE_PROJECT_NAME Stm32-Nucleo)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Core project settings
-project(${CMAKE_PROJECT_NAME})
+project(${CMAKE_PROJECT_NAME} LANGUAGES C CXX)
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
-# Enable CMake support for ASM and C languages
+# Enable CMake support for ASM, C and C++ languages
 enable_language(C ASM)
+enable_language(CXX)
 
-# Create an executable object type
+# Create an executable object type before importing STM32CubeMX sources
 add_executable(${CMAKE_PROJECT_NAME})
 
 # Add STM32CubeMX generated sources
@@ -42,14 +48,23 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
 )
 
+# Importação de todos os arquivos .cpp da pasta eFLL
+file(GLOB FUZZY "../Bibliotecas-Globais-C/eFLL/*.cpp")
+
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+
+    # Biblioteca Fuzzy (arquivos .cpp)
+    ${FUZZY}
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+
+    # Biblioteca Fuzzy (arquivos .h)
+    ../Bibliotecas-Globais-C/eFLL
 )
 
 # Add project symbols (macros)
