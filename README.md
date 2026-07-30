@@ -28,6 +28,7 @@ Ao gerar o projeto pelo STM32CubeMX, vá até a aba **Project Manager** e config
 ### 2. Instalação das Extensões no VS Code
 
 * Instale a extensão **STM32Cube for Visual Studio Code**.
+* Instale a extensão **PlatformIO IDE**.
 * Na aba de extensões do STM32Cube, vincule o caminho do executável do `STM32CubeMX.exe`.
 * Instale os drivers de identificação da placa na seção **Install ST-Link USB drivers** da extensão.
 
@@ -59,8 +60,6 @@ Adicione a variável indicando o caminho do seu compilador ARM dentro do arquivo
 1. Pressione `Ctrl + Shift + P`, digite e selecione: **CMake: Delete Cache and Reconfigure**.
 2. Repita o atalho `Ctrl + Shift + P` e selecione: **Developer: Reload Window**.
 > *Nota:* Se o painel `OUTPUT` do VS Code retornar `-- Generating done`, o ambiente foi configurado com sucesso.
-
-
 
 ### 5. Configuração dos Arquivos de Depuração (`.vscode/`)
 
@@ -144,9 +143,14 @@ Este arquivo inicia o OpenOCD em segundo plano via porta `50000`, evitando erros
 
 ## 🚀 Como Executar e Depurar
 
+### Stm32-Nucleo
 1. Conecte sua placa STM32 Nucleo à porta USB do computador.
 2. Pressione `Ctrl + Shift + P` e digite **CMake: Debug** para compilar o código, gravá-lo na memória flash e iniciar a sessão de depuração.
 3. **Para encerrar a depuração:** Clique no botão de parada (quadrado vermelho `[]`), retorne ao terminal e pressione `Ctrl + C` para fechar o processo do compilador/OpenOCD.
+
+### Arduino-Uno
+1. Conecte sua placa Arduino-Uno à porta USB do computador.
+2. Aperte o botão ✔️ localizado na extremidade inferior mais à direita do painel do VsCode para depurar e gravar o código.
 
 # A fazer
 [] Escrever o que foi realizado no tópico de "Machine Learning (otimização do modelo), e explicar o que cada coisa faz"
