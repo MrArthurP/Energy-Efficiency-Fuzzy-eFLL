@@ -29,6 +29,9 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f3xx_hal.h"
 
+/* USART handle used by main */
+extern UART_HandleTypeDef huart2;
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 

@@ -20,6 +20,9 @@ CMAKE_ADDR2LINE:FILEPATH=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/
 //Path to a program.
 CMAKE_AR:FILEPATH=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-ar.exe
 
+//ASM compiler
+CMAKE_ASM_COMPILER:STRING=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gcc.exe
+
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
 CMAKE_ASM_COMPILER_AR:FILEPATH=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gcc-ar.exe
@@ -47,6 +50,9 @@ CMAKE_ASM_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 // MinSizeRel ...
 CMAKE_BUILD_TYPE:STRING=Debug
 
+//CXX compiler
+CMAKE_CXX_COMPILER:STRING=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-g++.exe
+
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
 CMAKE_CXX_COMPILER_AR:FILEPATH=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gcc-ar.exe
@@ -69,6 +75,9 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 
 //Flags used by the CXX compiler during RELWITHDEBINFO builds.
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
+
+//C compiler
+CMAKE_C_COMPILER:STRING=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gcc.exe
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -113,11 +122,6 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Enable/Disable output of build database during the build.
 CMAKE_EXPORT_BUILD_DATABASE:BOOL=
-
-//Enable output of a compile_commands.json file listing the exact
-// compiler invocation for each translation unit. Implemented by
-// the Makefile and Ninja generators; ignored elsewhere.
-CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE
 
 //Value Computed by CMake.
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=D:/Projetos/Simulador-IA/Stm32-Nucleo/build/Debug/CMakeFiles/pkgRedirects
@@ -228,10 +232,8 @@ CMAKE_STRIP:FILEPATH=C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-
 //Path to a program.
 CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 
-//Path to a CMake toolchain file, read early in the CMake run,
-// that specifies the compilers, toolchain utilities, and target-platform
-// information used when cross-compiling.
-CMAKE_TOOLCHAIN_FILE:UNINITIALIZED=D:/Projetos/Simulador-IA/Stm32-Nucleo/cmake/gcc-arm-none-eabi.cmake
+//The CMake toolchain file
+CMAKE_TOOLCHAIN_FILE:FILEPATH=D:/Projetos/Simulador-IA/Stm32-Nucleo/cmake/gcc-arm-none-eabi.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -260,6 +262,8 @@ Stm32-Nucleo_SOURCE_DIR:STATIC=D:/Projetos/Simulador-IA/Stm32-Nucleo
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER
+CMAKE_ASM_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_ASM_COMPILER_AR
 CMAKE_ASM_COMPILER_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_ASM_COMPILER_RANLIB
@@ -289,6 +293,8 @@ CMAKE_COMMAND:INTERNAL=C:/Program Files/CMake/bin/cmake.exe
 CMAKE_CPACK_COMMAND:INTERNAL=C:/Program Files/CMake/bin/cpack.exe
 //Path to ctest program executable.
 CMAKE_CTEST_COMMAND:INTERNAL=C:/Program Files/CMake/bin/ctest.exe
+//ADVANCED property for variable: CMAKE_CXX_COMPILER
+CMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_COMPILER_AR
 CMAKE_CXX_COMPILER_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_COMPILER_RANLIB
@@ -303,6 +309,8 @@ CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_RELWITHDEBINFO
 CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_C_COMPILER
+CMAKE_C_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_COMPILER_AR
 CMAKE_C_COMPILER_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_COMPILER_RANLIB

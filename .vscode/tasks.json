@@ -6,10 +6,14 @@
             "type": "shell",
             "command": "C:/arm-compiler/xpack-openocd-0.12.0-7/bin/openocd.exe",
             "args": [
-                "-s", "C:/arm-compiler/xpack-openocd-0.12.0-7/openocd/scripts",
-                "-f", "interface/stlink.cfg",
-                "-f", "target/stm32f3x.cfg",
-                "-c", "gdb_port 50000"
+                "-s",
+                "C:/arm-compiler/xpack-openocd-0.12.0-7/openocd/scripts",
+                "-f",
+                "interface/stlink.cfg",
+                "-f",
+                "target/stm32f3x.cfg",
+                "-c",
+                "gdb_port 50000"
             ],
             "isBackground": true,
             "problemMatcher": [
@@ -29,6 +33,14 @@
                     }
                 }
             ]
+        },
+        {
+            "label": "Flash and Run (OpenOCD)",
+            "type": "shell",
+            "command": "powershell",
+            "args": ["-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/scripts/flash_and_run.ps1"],
+            "group": { "kind": "build", "isDefault": false },
+            "problemMatcher": []
         }
     ]
 }

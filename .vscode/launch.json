@@ -1,7 +1,28 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": []
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug STM32 OpenOCD",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/Stm32-Nucleo/build/Debug/Stm32-Nucleo.elf",
+      "cwd": "${workspaceFolder}/Stm32-Nucleo",
+      "miDebuggerPath": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gdb.exe",
+      "miDebuggerServerAddress": "localhost:50000",
+      "MIMode": "gdb",
+      "externalConsole": false,
+      "preLaunchTask": "Iniciar OpenOCD",
+      "setupCommands": [
+        {
+          "description": "Connect to OpenOCD target",
+          "text": "target remote localhost:50000"
+        },
+        {
+          "description": "Load the ELF",
+          "text": "load"
+        }
+      ],
+      "stopAtConnect": false
+    }
+  ]
 }

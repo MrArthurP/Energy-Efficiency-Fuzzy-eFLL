@@ -2,16 +2,6 @@
     "cmake.sourceDirectory": "${workspaceFolder}/Stm32-Nucleo",
     "cmake.configureEnvironment": {
         "PATH": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin;${env:PATH}"
-    },
-    "cmake.debugConfig": {
-        "type": "cppdbg",
-        "MIMode": "gdb",
-        "miDebuggerPath": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gdb.exe",
-        "miDebuggerServerAddress": "localhost:50000",
-        "program": "${workspaceFolder}/Stm32-Nucleo/build/Debug/Stm32-Nucleo.elf",
-        "cwd": "${workspaceFolder}/Stm32-Nucleo",
-        "externalConsole": false,
-        "preLaunchTask": "Iniciar OpenOCD"
     }
 }
 

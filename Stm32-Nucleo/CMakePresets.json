@@ -8,7 +8,10 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
 		    "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
             "cacheVariables": {
-                "STM32_TOOLCHAIN_PATH": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin"
+                "STM32_TOOLCHAIN_PATH": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin",
+                "CMAKE_C_COMPILER": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-g++.exe",
+                "CMAKE_ASM_COMPILER": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gcc.exe"
             }
         },
         {

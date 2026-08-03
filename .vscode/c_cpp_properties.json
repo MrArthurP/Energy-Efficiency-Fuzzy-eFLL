@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "name": "STM32F3",
+      "compilerPath": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gcc.exe",
+      "intelliSenseMode": "windows-gcc-x64",
+      "includePath": [
+        "${workspaceFolder}/Stm32-Nucleo/Core/Inc",
+        "${workspaceFolder}/Stm32-Nucleo/Drivers/STM32F3xx_HAL_Driver/Inc",
+        "${workspaceFolder}/Stm32-Nucleo/Drivers/STM32F3xx_HAL_Driver/Inc/Legacy",
+        "${workspaceFolder}/Stm32-Nucleo/Drivers/CMSIS/Device/ST/STM32F3xx/Include",
+        "${workspaceFolder}/Stm32-Nucleo/Drivers/CMSIS/Include",
+        "${workspaceFolder}/Bibliotecas-Globais-C/eFLL"
+      ],
+      "defines": [
+        "STM32F303xE",
+        "USE_HAL_DRIVER"
+      ],
+      "compilerArgs": [
+        "-mcpu=cortex-m4",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard"
+      ]
+    }
+  ],
+  "version": 4
+}

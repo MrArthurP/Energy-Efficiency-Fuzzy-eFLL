@@ -9,10 +9,12 @@ set(MX_Defines_Syms
 )
 
 # STM32CubeMX generated include paths
+set(STM32_HAL_DRIVER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver)
+
 set(MX_Include_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Inc
+    ${STM32_HAL_DRIVER_DIR}/Inc/Legacy
+    ${STM32_HAL_DRIVER_DIR}/Inc
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/Include
 )
@@ -25,24 +27,36 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/sysmem.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/syscalls.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../startup_stm32f303xe.s
+
+    # Gerenciador de controladores
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/controller_reporter.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/serial_logger.c
+    
+
+    # Controladores
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/fuzzy-controller.c
 )
 
 # STM32 HAL/LL Drivers
 set(STM32_Drivers_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/system_stm32f3xx.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_rcc.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_rcc_ex.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_gpio.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_dma.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_cortex.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_pwr.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_pwr_ex.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_flash.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_flash_ex.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_i2c.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_i2c_ex.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_exti.c
+
+    # Drivers for UART/USART
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_uart.c
+    ${STM32_HAL_DRIVER_DIR}/Src/stm32f3xx_hal_usart.c
 )
 
 # Drivers Midllewares

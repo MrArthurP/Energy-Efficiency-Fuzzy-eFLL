@@ -19,8 +19,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "eFLL_wrapper.h"
+#include "serial_logger.h"
+#include "controller_reporter.h"
 
 Fuzzy *fuzzy = NULL;
+UART_HandleTypeDef huart2;
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -89,21 +92,56 @@ int main(void)
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
 
-  fuzzy = Fuzzy_create();
-  if (fuzzy == NULL)
+  /* Inicializa UART2 para debug e registra o logger */
+  {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    /* Enable clocks */
+    __HAL_RCC_USART2_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /* PA2 TX PA3 RX */
+    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /* Configure huart2 */
+    huart2.Instance = USART2;
+    huart2.Init.BaudRate = 115200;
+    huart2.Init.WordLength = UART_WORDLENGTH_8B;
+    huart2.Init.StopBits = UART_STOPBITS_1;
+    huart2.Init.Parity = UART_PARITY_NONE;
+    huart2.Init.Mode = UART_MODE_TX_RX;
+    huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+    HAL_UART_Init(&huart2);
+
+    /* Aguarda o terminal serial abrir e estabilizar antes de enviar a mensagem. */
+    HAL_Delay(2000);
+    {
+      uint8_t msg[] = "Placa Inicializada com Sucesso!\r\n";
+      HAL_UART_Transmit(&huart2, msg, sizeof(msg) - 1, 1000);
+    }
+
+    SerialLogger_Init(&huart2);
+    /* Diagnostic message to verify serial output immediately after init */
+    SerialLogger_Printf("[BOOT] Serial initialized (115200 8N1)\r\n");
+  }
+
+  /* Inicializa e reporta o controlador (Fuzzy, Logistic, etc.) */
+  if (ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0)
   {
     Error_Handler();
   }
-  
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+  
   }
   /* USER CODE END 3 */
 }

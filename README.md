@@ -113,7 +113,7 @@ Este arquivo inicia o OpenOCD em segundo plano via porta `50000`, evitando erros
                 "-s", "C:/arm-compiler/xpack-openocd-0.12.0-7/openocd/scripts",
                 "-f", "interface/stlink.cfg",
                 "-f", "target/stm32f3x.cfg",
-                "-c", "gdb_port 50000"
+                "-c", "gdb port 50000"
             ],
             "isBackground": true,
             "problemMatcher": [
