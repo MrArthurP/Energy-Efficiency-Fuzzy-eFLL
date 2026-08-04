@@ -155,5 +155,6 @@ Este arquivo inicia o OpenOCD em segundo plano via porta `50000`, evitando erros
 # A fazer
 [] Escrever o que foi realizado no tópico de "Machine Learning (otimização do modelo), e explicar o que cada coisa faz"
 [] Comparar os modelos existentes (fuzzy, Regressão Logística e Árvore de Decisão) com um condicional básico no funcionamento do Stm32Nucleo e realizar a análise
+[] Atualizar README.md de acordo com os Processos registrados
 
 
