@@ -8,10 +8,27 @@
         "MIMode": "gdb",
         "miDebuggerPath": "C:/arm-compiler/xpack-arm-none-eabi-gcc-15.2.1-1.1/bin/arm-none-eabi-gdb.exe",
         "miDebuggerServerAddress": "localhost:50000",
-        "program": "${workspaceFolder}/Stm32-Nucleo/build/Debug/Stm32-Nucleo.elf",
-        "cwd": "${workspaceFolder}/Stm32-Nucleo",
+        "program": "D:/Projetos/Simulador-IA/Stm32-Nucleo/build/Debug/Stm32-Nucleo.elf",
+        "cwd": "D:/Projetos/Simulador-IA/Stm32-Nucleo",
         "externalConsole": false,
-        "preLaunchTask": "Iniciar OpenOCD"
+        "preLaunchTask": "Iniciar OpenOCD",
+        "setupCommands": [
+            {
+                "text": "target extended-remote :50000"
+            },
+            {
+                "text": "monitor reset init"
+            },
+            {
+                "text": "file D:/Projetos/Simulador-IA/Stm32-Nucleo/build/Debug/Stm32-Nucleo.elf"
+            },
+            {
+                "text": "load"
+            },
+            {
+                "text": "monitor reset"
+            }
+        ]
     }
 }
 
