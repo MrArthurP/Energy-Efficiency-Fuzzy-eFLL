@@ -46,3 +46,6 @@ Bibliotecas-Globais-C/*/.vscode/
 Bibliotecas-Globais-C/*/.idea/
 Bibliotecas-Globais-C/*/*~
 Bibliotecas-Globais-C/*/#*#
+
+# modelos de machine learning
+JupyterNotebook/modelos_c/*.c
