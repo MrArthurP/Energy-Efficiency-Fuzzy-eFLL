@@ -144,6 +144,10 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+    //int FuzModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
+    //int RegModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
+    //int DecModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
