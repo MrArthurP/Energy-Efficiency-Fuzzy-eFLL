@@ -35,6 +35,10 @@ set(MX_Application_Src
     # Logger serial
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/serial_logger.c
 
+    # Modelos de Machine Learning
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/dec_modelo.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/reg_modelo.c
+
     
 )
 

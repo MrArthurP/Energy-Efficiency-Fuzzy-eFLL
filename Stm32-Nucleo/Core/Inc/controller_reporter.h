@@ -10,6 +10,7 @@ extern "C" {
 typedef enum {
     CTRL_TYPE_FUZZY = 0,
     CTRL_TYPE_LOGISTIC,
+    CTRL_TYPE_DECISION_TREE,
     CTRL_TYPE_OTHER,
 } ControllerType;
 

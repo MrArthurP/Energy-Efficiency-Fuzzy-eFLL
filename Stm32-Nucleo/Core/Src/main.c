@@ -19,6 +19,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "eFLL_wrapper.h"
+#include "reg_modelo.h"
+#include "dec_modelo.h"
 #include "serial_logger.h"
 #include "controller_reporter.h"
 
@@ -128,8 +130,8 @@ int main(void)
     SerialLogger_Printf("[BOOT] Serial initialized (115200 8N1)\r\n");
   }
 
-  /* Inicializa e reporta o controlador (Fuzzy, Logistic, etc.) */
-  if (ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0)
+  /* Inicializa e reporta o controlador (Fuzzy, Logistic ou DecisionTree) */
+  if (ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0)
   {
     Error_Handler();
   }

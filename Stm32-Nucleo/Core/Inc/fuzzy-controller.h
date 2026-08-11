@@ -54,11 +54,27 @@ float FuzzyController_Run(float bateria_pct, float taxa_normalizada);
 int FuzzyController_DecideLigarGPRS(float saida_defuzzificada);
 
 /**
+ * @brief  Wrapper de conveniência: executa o controlador fuzzy de ponta a
+ *         ponta (fuzzifica, defuzzifica e aplica o limiar) e retorna
+ *         diretamente a decisão binária, na mesma assinatura usada pelos
+ *         demais modelos (RegModelo_DecideLigarGPRS / DecModelo_DecideLigarGPRS).
+ * @param  bateria_pct: percentual de carga da bateria (0-100)
+ * @param  taxa_normalizada: taxa de acerto já normalizada (0-100), ver
+ *         FuzzyController_NormalizaTaxa()
+ * @retval 1 se o GPRS deve ser ligado, 0 caso contrário (inclusive se o
+ *         controlador ainda não tiver sido inicializado via
+ *         FuzzyController_Init())
+ */
+
+ int FuzModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
+
+/**
  * @brief  Libera toda a memória alocada pelo controlador (conjuntos,
  *         entradas, saída, regras e a instância Fuzzy).
  *         Normalmente não é necessária em um firmware embarcado que roda
  *         para sempre, mas é útil para testes/reinicialização.
  */
+
 void FuzzyController_Deinit(void);
 
 #ifdef __cplusplus

@@ -262,6 +262,20 @@ int FuzzyController_DecideLigarGPRS(float saida_defuzzificada)
     return (saida_defuzzificada >= FUZZY_GPRS_THRESHOLD) ? 1 : 0;
 }
 
+int FuzModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada)
+{
+    float saida;
+
+    if (!g_inicializado)
+    {
+        return 0;
+    }
+
+    saida = FuzzyController_Run(bateria_pct, taxa_normalizada);
+
+    return FuzzyController_DecideLigarGPRS(saida);
+}
+
 void FuzzyController_Deinit(void)
 {
     int i;
