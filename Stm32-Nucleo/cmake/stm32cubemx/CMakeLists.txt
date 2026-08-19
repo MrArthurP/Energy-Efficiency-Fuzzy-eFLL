@@ -28,7 +28,8 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/syscalls.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../startup_stm32f303xe.s
 
-    # Arquivos de controladores digitais
+    # Arquivos de controladores digitais e seus inicializadores
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/controller_profiler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/controller_reporter.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/fuzzy-controller.c
 

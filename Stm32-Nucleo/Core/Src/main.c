@@ -17,19 +17,23 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+# include <math.h>
+# include <stdio.h>
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "main.h"
+/* MACHINE LEARNING / CONTROLLER includes */
+#include "fuzzy-controller.h"
 #include "eFLL_wrapper.h"
 #include "reg_modelo.h"
 #include "dec_modelo.h"
+/* SERIAL MONITOR includes */
 #include "serial_logger.h"
+/* CONTROLLER INIT REPORTER AND EVALUATION includes */
 #include "controller_reporter.h"
-
-Fuzzy *fuzzy = NULL;
-UART_HandleTypeDef huart2;
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
+#include "controller_profiler.h"
+/* STM32 HAL includes */
+# include "stm32f3xx_hal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +54,8 @@ UART_HandleTypeDef huart2;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+Fuzzy *fuzzy = NULL;
+UART_HandleTypeDef huart2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,7 +98,8 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  /* Inicializa UART2 para debug e registra o logger */
+
+  //* Inicializa UART2 para debug e registra o logger */
   {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     /* Enable clocks */
@@ -129,12 +135,21 @@ int main(void)
     /* Diagnostic message to verify serial output immediately after init */
     SerialLogger_Printf("[BOOT] Serial initialized (115200 8N1)\r\n");
   }
+  /* Inicializa o função de avaliação */
+  ControllerProfiler_Init();
 
-  /* Inicializa e reporta o controlador (Fuzzy, Logistic ou DecisionTree) */
-  if (ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0)
+  /* Inicializa e reporta os controladores (Fuzzy, Logistic e DecisionTree) */
+  if (ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0 || ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0 || ControllerReporter_InitController(CTRL_TYPE_DECISION_TREE) != 0)
   {
     Error_Handler();
   }
+
+  float bateria_pct = 9.4f; /* Exemplo de valor de bateria em porcentagem */
+  float taxa_normalizada = 45.0f; /* Exemplo de valor de taxa normalizada (0-100) */
+
+  ControllerProfiler_MedirEReportar("Fuzzy",          FuzModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada);
+  ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada);
+  ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada);
   
   /* USER CODE END 2 */
 
