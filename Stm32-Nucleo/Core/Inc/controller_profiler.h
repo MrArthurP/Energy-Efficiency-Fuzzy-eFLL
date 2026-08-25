@@ -25,6 +25,7 @@ typedef int (*ControllerDecideFn)(float bateria_pct, float taxa_normalizada);
 
 /* Resultado de uma medição de execução */
 typedef struct {
+    int      index;     /* index de cada linha printada - para monitor serial */
     uint32_t ciclos;    /* ciclos de clock consumidos pela chamada */
     float    tempo_us;  /* tempo estimado em microssegundos (baseado em SystemCoreClock) */
     int      decisao;   /* valor retornado pela função medida (1 = ligar, 0 = não ligar) */
@@ -50,7 +51,8 @@ void ControllerProfiler_Init(void);
  */
 ControllerProfilerResult ControllerProfiler_Medir(ControllerDecideFn fn,
                                                    float bateria_pct,
-                                                   float taxa_normalizada);
+                                                   float taxa_normalizada,
+                                                   int index);
 
 /**
  * @brief  Igual a ControllerProfiler_Medir(), mas também imprime o
@@ -61,7 +63,8 @@ ControllerProfilerResult ControllerProfiler_Medir(ControllerDecideFn fn,
 ControllerProfilerResult ControllerProfiler_MedirEReportar(const char *nome,
                                                              ControllerDecideFn fn,
                                                              float bateria_pct,
-                                                             float taxa_normalizada);
+                                                             float taxa_normalizada,
+                                                             int index);
 
 #ifdef __cplusplus
 }

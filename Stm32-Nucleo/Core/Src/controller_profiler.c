@@ -24,7 +24,8 @@ static uint32_t ControllerProfiler_GetCycles(void)
 
 ControllerProfilerResult ControllerProfiler_Medir(ControllerDecideFn fn,
                                                    float bateria_pct,
-                                                   float taxa_normalizada)
+                                                   float taxa_normalizada,
+                                                   int index)
 {
     ControllerProfilerResult resultado;
     uint32_t inicio, fim;
@@ -44,11 +45,13 @@ ControllerProfilerResult ControllerProfiler_Medir(ControllerDecideFn fn,
 ControllerProfilerResult ControllerProfiler_MedirEReportar(const char *nome,
                                                              ControllerDecideFn fn,
                                                              float bateria_pct,
-                                                             float taxa_normalizada)
+                                                             float taxa_normalizada,
+                                                             int index)
 {
-    ControllerProfilerResult resultado = ControllerProfiler_Medir(fn, bateria_pct, taxa_normalizada);
+    ControllerProfilerResult resultado = ControllerProfiler_Medir(fn, bateria_pct, taxa_normalizada, index);
 
-    SerialLogger_Printf("[Profiler] %s: %lu ciclos (%lu us) -> decisao=%d\r\n",
+    SerialLogger_Printf("[%d], %s, %lu ciclos, %lu us, %d decisao\r\n",
+                         index,
                          nome,
                          (unsigned long)resultado.ciclos,
                          (unsigned long)resultado.tempo_us,

@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 # include <math.h>
 # include <stdio.h>
+# include <stdlib.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "main.h"
@@ -144,12 +145,18 @@ int main(void)
     Error_Handler();
   }
 
-  float bateria_pct = 9.4f; /* Exemplo de valor de bateria em porcentagem */
-  float taxa_normalizada = 45.0f; /* Exemplo de valor de taxa normalizada (0-100) */
+  float passo = 100.0/299.0;
 
-  ControllerProfiler_MedirEReportar("Fuzzy",          FuzModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada);
-  ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada);
-  ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada);
+  float bateria_pct = 0.0; /* variável que carrega procentagem de bateria */
+  float taxa_normalizada = 0.0; /* variável que carrega o valor da taxa de sinal recebido */
+ 
+
+  int index = 0;
+  
+
+  ControllerProfiler_MedirEReportar("Fuzzy",          FuzModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   
   /* USER CODE END 2 */
 
@@ -159,9 +166,22 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-    //int FuzModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
-    //int RegModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
-    //int DecModelo_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
+    if (index < 300) {
+      
+      index++;
+
+      bateria_pct = 100 - (index * passo); /* valor da bateria começando em 100 e acabando em 0 */
+      taxa_normalizada = rand() % 100; /* valor da taxa de sinal aleatória entre 0-100 */ 
+
+      if (taxa_normalizada == 99) { /* normativa do sinal - taxa = 99 é equivalente a sem sinal */
+        taxa_normalizada = 0;
+      }
+
+      ControllerProfiler_MedirEReportar("Fuzzy",          FuzModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+
+    } 
 
     /* USER CODE BEGIN 3 */
   }
