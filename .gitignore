@@ -46,3 +46,34 @@ Bibliotecas-Globais-C/*/.vscode/
 Bibliotecas-Globais-C/*/.idea/
 Bibliotecas-Globais-C/*/*~
 Bibliotecas-Globais-C/*/#*#
+
+# modelos de machine learning
+Stm32-Nucleo/modelos_onnx/*.onnx
+
+# arquivos gerados pelo modelo onnx
+Stm32-Nucleo/st_ai_output/**
+
+# Packs
+Packs/
+
+!Packs/STMicroelectronics/
+!Packs/STMicroelectronics/X-CUBE-AI/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/
+
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/TFLiteMicro/**
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/TFLiteMicro/Inc/**
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/TFLiteMicro/Src/**
+
+*.pack
+*.pdsc
+*.html
+*.xml
+
+# Ai-Models
+Stm32-Nucleo/Ai-Models/.metadata/
+
+# st_ai_output
+Stm32-Nucleo/st_ai_output/
