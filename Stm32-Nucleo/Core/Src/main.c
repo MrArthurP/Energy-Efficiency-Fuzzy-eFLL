@@ -187,7 +187,7 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-
+/* USER CODE BEGIN CLOCK CONFIG*/
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -223,6 +223,7 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
+/* USER CODE END CLOCK CONFIG*/
 
 /* USER CODE BEGIN 4 */
 

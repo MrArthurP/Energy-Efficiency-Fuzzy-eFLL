@@ -1,27 +1,30 @@
-# Build outputs
-build/
-*.elf
-*.bin
-*.hex
-*.map
-*.o
-*.d
-*.su
-*.lst
+# modelos de machine learning
+Stm32-Nucleo/modelos_onnx/*.onnx
 
-# CMake generated files
-.cmake/
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-compile_commands.json
+# arquivos gerados pelo modelo onnx
+Stm32-Nucleo/st_ai_output/**
 
-# IDE / editor temporary files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
+# Packs
+Packs/
 
-# Local STM32CubeMX / toolchain artifacts
-*.backup
+!Packs/STMicroelectronics/
+!Packs/STMicroelectronics/X-CUBE-AI/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/
+
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/TFLiteMicro/**
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/TFLiteMicro/Inc/**
+!Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/TFLiteMicro/Src/**
+
+*.pack
+*.pdsc
+*.html
+*.xml
+
+# Ai-Models
+Ai-Models/.metadata/
+
+# st_ai_output
+st_ai_output/
