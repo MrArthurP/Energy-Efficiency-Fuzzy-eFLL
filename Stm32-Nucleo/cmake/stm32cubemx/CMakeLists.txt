@@ -52,9 +52,7 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nba_model_data_params.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/qda_model.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/qda_model_data.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/qda_model_data_params.c
-
-    
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/qda_model_data_params.c   
 )
 
 # STM32 HAL/LL Drivers

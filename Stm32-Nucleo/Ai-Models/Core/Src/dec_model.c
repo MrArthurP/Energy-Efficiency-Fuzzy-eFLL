@@ -1,5 +1,15 @@
+/**
+  ******************************************************************************
+  * @file           : dec_model.c
+  * @brief          : Modelo de Machine Learning gerado automaticamente.
+  *                   Revise esta descricao conforme o modelo real.
+  ******************************************************************************
+  */
+
 #include <string.h>
-void predict_dec_model(double * input, double * output) {
+#include "dec_model.h"
+
+void DecModel_Score(double * input, double * output) {
     double var0[2];
     if (input[1] <= 33.5) {
         memcpy(var0, (double[]){1.0, 0.0}, 2 * sizeof(double));
@@ -48,3 +58,18 @@ void predict_dec_model(double * input, double * output) {
     }
     memcpy(output, var0, 2 * sizeof(double));
 }
+
+int DecModel_DecideLigarGPRS(float bateria_pct, float taxa_normalizada)
+{
+    double input[DECMODEL_NUM_INPUTS];
+    double output[DECMODEL_NUM_OUTPUTS];
+
+    input[0] = (double)bateria_pct;
+    input[1] = (double)taxa_normalizada;
+
+    DecModel_Score(input, output);
+
+    return (output[DECMODEL_CLASSE_LIGA] > output[DECMODEL_CLASSE_NAO_LIGA]) ? 1 : 0;
+}
+
+
