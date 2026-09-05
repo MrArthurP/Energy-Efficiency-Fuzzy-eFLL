@@ -62,6 +62,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    Ai-Models/Core/Inc
+    tools/STM32Tools/stedgeai/targets/common/EmbedNets/tools/inspector/workspace/include
 
     # Biblioteca Fuzzy (arquivos .h)
     ../Bibliotecas-Globais-C/eFLL

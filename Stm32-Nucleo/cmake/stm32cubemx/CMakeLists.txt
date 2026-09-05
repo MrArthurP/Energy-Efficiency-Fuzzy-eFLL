@@ -36,9 +36,23 @@ set(MX_Application_Src
     # Logger serial
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/serial_logger.c
 
-    # Modelos de Machine Learning
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/dec_model.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/reg_model.c
+    # Modelos de Machine Learning via mgen2c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/dec_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/reg_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/lgb_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/rfr_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/svm_model.c
+
+    # Modelos de Machine Learning via stm32ai onnx
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nnw_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nnw_model_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nnw_model_data_params.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nba_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nba_model_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nba_model_data_params.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/qda_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/qda_model_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/qda_model_data_params.c
 
     
 )

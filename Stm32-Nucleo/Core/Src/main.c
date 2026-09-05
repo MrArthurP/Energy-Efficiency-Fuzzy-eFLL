@@ -26,8 +26,8 @@
 /* MACHINE LEARNING / CONTROLLER includes */
 #include "fuzzy-controller.h"
 #include "eFLL_wrapper.h"
-#include "reg_modelo.h"
-#include "dec_modelo.h"
+// #include "reg_modelo.h"
+// #include "dec_modelo.h"
 /* SERIAL MONITOR includes */
 #include "serial_logger.h"
 /* CONTROLLER INIT REPORTER AND EVALUATION includes */
@@ -155,8 +155,8 @@ int main(void)
   
 
   ControllerProfiler_MedirEReportar("Fuzzy",          FuzModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-  ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-  ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  // ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  // ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   
   /* USER CODE END 2 */
 
@@ -178,8 +178,8 @@ int main(void)
       }
 
       ControllerProfiler_MedirEReportar("Fuzzy",          FuzModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-      ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-      ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      // ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      // ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
 
     } 
 
