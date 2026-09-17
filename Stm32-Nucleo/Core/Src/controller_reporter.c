@@ -2,7 +2,7 @@
 #include "serial_logger.h"
 
 #include "fuzzy-controller.h"
-// #include "reg_modelo.h"
+#include "reg_model.h"
 #include "dec_model.h"
 
 int ControllerReporter_InitController(ControllerType type)
@@ -15,19 +15,19 @@ int ControllerReporter_InitController(ControllerType type)
             ControllerReporter_ReportCreation(CTRL_TYPE_FUZZY, (ret==0));
             break;
             
-        // case CTRL_TYPE_LOGISTIC:
-        // {
-        //     /* reg_modelo é stateless (apenas combinação linear + sigmoide):
-        //      * não há o que alocar/montar como no fuzzy. "Inicializar" aqui
-        //      * significa validar que o modelo responde corretamente a uma
-        //      * entrada de referência antes de liberá-lo para uso. */
-        //     double input[REG_MODELO_NUM_INPUTS] = {50.0, 50.0};
-        //     double prob = RegModelo_Probabilidade(input);
+        case CTRL_TYPE_LOGISTIC:
+        {
+            /* reg_modelo é stateless (apenas combinação linear + sigmoide):
+             * não há o que alocar/montar como no fuzzy. "Inicializar" aqui
+             * significa validar que o modelo responde corretamente a uma
+             * entrada de referência antes de liberá-lo para uso. */
+            double input[REGMODEL_NUM_INPUTS] = {50.0, 50.0};
+            double prob = RegModel_Probabilidade(input);
 
-        //     ret = (prob >= 0.0 && prob <= 1.0) ? 0 : -1;
-        //     ControllerReporter_ReportCreation(CTRL_TYPE_LOGISTIC, (ret == 0));
-        //     break;
-        // }
+            ret = (prob >= 0.0 && prob <= 1.0) ? 0 : -1;
+            ControllerReporter_ReportCreation(CTRL_TYPE_LOGISTIC, (ret == 0));
+            break;
+        }
         case CTRL_TYPE_DECISION_TREE:
         {
             /* dec_modelo também é stateless: validamos que as duas

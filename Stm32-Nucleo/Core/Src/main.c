@@ -26,7 +26,7 @@
 /* MACHINE LEARNING / CONTROLLER includes */
 #include "fuzzy-controller.h"
 #include "eFLL_wrapper.h"
-// #include "reg_modelo.h"
+#include "reg_model.h"
 #include "dec_model.h"
 /* SERIAL MONITOR includes */
 #include "serial_logger.h"
@@ -140,7 +140,7 @@ int main(void)
   ControllerProfiler_Init();
 
   /* Inicializa e reporta os controladores (Fuzzy, Logistic e DecisionTree) */
-  if (ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0 || ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0 || ControllerReporter_InitController(CTRL_TYPE_DECISION_TREE) != 0)
+  if (ControllerReporter_InitController(CTRL_TYPE_DECISION_TREE) != 0 || ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0 || ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0)
   {
     Error_Handler();
   }
@@ -178,7 +178,7 @@ int main(void)
       }
 
       ControllerProfiler_MedirEReportar("Fuzzy",          FuzModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-      // ControllerProfiler_MedirEReportar("Logistica",      RegModelo_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      ControllerProfiler_MedirEReportar("Logistica",      RegModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
 
     } 
