@@ -1,3 +1,4 @@
+#include "lgb_model.h"
 #include <math.h>
 #include <string.h>
 double sigmoid(double x) {
@@ -7,7 +8,7 @@ double sigmoid(double x) {
     }
     return 1.0 / (1.0 + exp(-x));
 }
-void predict_lgb_model(double * input, double * output) {
+void LgbModel_Score(double * input, double * output) {
     double var0;
     if (input[1] > 33.50000000000001) {
         if (input[0] > 19.900000000000002) {
@@ -1303,4 +1304,17 @@ void predict_lgb_model(double * input, double * output) {
     double var32;
     var32 = sigmoid(var0 + var1 + var2 + var3 + var4 + var5 + var6 + var7 + var8 + var9 + var10 + var11 + var12 + var13 + var14 + var15 + var16 + var17 + var18 + var19 + var20 + var21 + var22 + var23 + var24 + var25 + var26 + var27 + var28 + var29 + var30 + var31);
     memcpy(output, (double[]){1.0 - var32, var32}, 2 * sizeof(double));
+}
+
+int LgbModel_DecideLigarGPRS(float bateria_pct, float taxa_normalizada)
+{
+    double input[LGB_MODEL_NUM_INPUTS];
+    double output[LGB_MODEL_NUM_OUTPUTS];
+
+    input[0] = (double)bateria_pct;
+    input[1] = (double)taxa_normalizada;
+
+    LgbModel_Score(input, output);
+
+    return (output[LGB_MODEL_CLASSE_LIGA] > output[LGB_MODEL_CLASSE_NAO_LIGA]) ? 1 : 0;
 }

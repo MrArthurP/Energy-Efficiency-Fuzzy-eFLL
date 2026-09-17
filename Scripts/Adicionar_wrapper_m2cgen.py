@@ -1,204 +1,250 @@
 #!/usr/bin/env python3
 """
 Script para gerar o wrapper e o header a partir de um arquivo .c produzido
-pelo m2cgen (árvore de decisão com 2 features e 2 classes).
+pelo m2cgen.
+
+Suporta as duas familias de saida que o m2cgen gera:
+
+  A) MODELOS COM VETOR DE SAIDA  (arvore de decisao, random forest, etc.)
+         void predict_x(double * input, double * output)
+     -> renomeada para "{Prefixo}_Score"
+     -> wrapper compara output[CLASSE_LIGA] com output[CLASSE_NAO_LIGA]
+
+  B) MODELOS DE VALOR UNICO  (regressao logistica, regressao linear, SVM...)
+         double predict_x(double * input)
+     -> renomeada para "{Prefixo}_Score"
+     -> e criada uma funcao "{Prefixo}_Probabilidade" com o calculo de
+        probabilidade ADEQUADO AO TIPO do modelo:
+            logistica : sigmoide do logit           1/(1+exp(-z))
+            svm       : sigmoide da margem (Platt)  1/(1+exp(-d))
+            linear    : valor previsto saturado em [0, 1]
+     -> wrapper compara a probabilidade com "{PREFIXO}_THRESHOLD"
 
 Uso:
-    python gerar_wrapper_m2cgen.py arquivo_modelo.c
+    python Adicionar_wrapper_m2cgen.py arquivo_modelo.c
+    python Adicionar_wrapper_m2cgen.py reg_model.c  --tipo logistica
+    python Adicionar_wrapper_m2cgen.py svm_model.c  --tipo svm
+    python Adicionar_wrapper_m2cgen.py lin_model.c  --tipo linear
+    python Adicionar_wrapper_m2cgen.py dec_model.c  --tipo arvore
+    python Adicionar_wrapper_m2cgen.py *.c          --threshold 0.6
+
+Sem "--tipo" o script tenta deduzir o tipo pela assinatura da funcao, pelo
+codigo (presenca de exp()/pow() indica kernel de SVM) e pelo nome do
+arquivo (reg/log -> logistica, lin -> linear, svm -> svm, dec/tree/rf ->
+arvore). Como regressao linear e logistica geram codigo IDENTICO (soma de
+input[i]*coef), nesses casos vale sempre passar "--tipo" explicitamente.
 
 O script:
-    - Extrai o nome da função de score (ex.: "DecModel_Score");
-    - Se encontrar função "predict_{nome}", renomeia para "{Prefixo}_Score";
-    - Conta o número de entradas e saídas usados no código;
-    - Cria o arquivo .h com defines, comentários e protótipos;
-    - Modifica o .c para incluir o .h e adiciona a função de decisão binária.
+    - Detecta a assinatura e o tipo do modelo;
+    - Renomeia "predict_{nome}" para "{Prefixo}_Score";
+    - Conta o numero de entradas (e saidas, quando houver);
+    - Cria o arquivo .h com defines, comentarios e prototipos;
+    - Modifica o .c: inclui o .h, garante <math.h> quando necessario, e
+      adiciona "{Prefixo}_Probabilidade" (modelos de valor unico) e
+      "{Prefixo}_DecideLigarGPRS".
 """
 
-import os
+import argparse
 import re
 import sys
 from pathlib import Path
 
 # ----------------------------------------------------------------------
-# 1. Parâmetros fixos (caso queira forçar nomes, descomente e ajuste)
+# 1. Parametros fixos (caso queira forcar valores, ajuste aqui)
 # ----------------------------------------------------------------------
 FORCAR_PREFIXO = None       # ex.: "MeuModelo"
-# FORCAR_INPUTS = None       # ex.: 2
-# FORCAR_OUTPUTS = None      # ex.: 2
-# CLASSE_NAO_LIGA = 0
-# CLASSE_LIGA = 1
+CLASSE_NAO_LIGA = 0
+CLASSE_LIGA = 1
+THRESHOLD_PADRAO = "0.5"    # limite de decisao dos modelos de valor unico
+
+TIPOS_VALOR_UNICO = ("logistica", "linear", "svm")
+TIPOS_SUPORTADOS = ("arvore",) + TIPOS_VALOR_UNICO
+
+DESCRICAO_TIPO = {
+    "arvore": "Arvore de Decisao",
+    "logistica": "Regressao Logistica",
+    "linear": "Regressao Linear",
+    "svm": "SVM (Support Vector Machine)",
+}
+
 
 # ----------------------------------------------------------------------
-# 2. Funções auxiliares
+# 2. Nomes / prefixos
 # ----------------------------------------------------------------------
-def extrair_nome_funcao_score(conteudo):
-    """
-    Procura pela definição da função score no formato:
-        void Nome_Score(double *input, double *output)
-    Retorna o nome completo ou None se não encontrado.
-    """
-    # Padrão para função predict_{nome}
-    padrao_predict = re.compile(r'void\s+(predict_\w+)\s*\([^)]*double\s*\*[^,]*,[^)]*double\s*\*[^)]*\)')
-    match = padrao_predict.search(conteudo)
-    if match:
-        return match.group(1)
-    
-    # Padrão mais flexível: aceita espaços extras e diferentes nomes de parâmetros
-    padrao = re.compile(r'void\s+(\w+_Score)\s*\([^)]*double\s*\*[^,]*,[^)]*double\s*\*[^)]*\)')
-    match = padrao.search(conteudo)
-    if match:
-        return match.group(1)
-    
-    # Tenta um padrão alternativo: função com qualquer nome que termine com _Score
-    padrao2 = re.compile(r'void\s+(\w+_Score)\s*\([^)]*\)')
-    match2 = padrao2.search(conteudo)
-    if match2:
-        return match2.group(1)
-    
-    # Última tentativa: qualquer função que contenha "Score" no nome e tenha parâmetros double
-    padrao3 = re.compile(r'void\s+(\w*Score\w*)\s*\([^)]*double\s*\*[^)]*\)')
-    match3 = padrao3.search(conteudo)
-    if match3:
-        return match3.group(1)
-    
-    return None
-
 def extrair_prefixo_do_nome_arquivo(nome_arquivo):
     """
-    Extrai um prefixo do nome do arquivo (ex.: dec_modelo.c -> DecModelo)
+    dec_modelo.c -> DecModelo ; reg_model.c -> RegModel
     """
     nome_base = Path(nome_arquivo).stem
-    # Remove extensões comuns
     nome_base = re.sub(r'\.(c|h|cpp|hpp)$', '', nome_base)
-    # Converte snake_case para CamelCase
-    partes = nome_base.split('_')
-    prefixo = ''.join([p.capitalize() for p in partes])
-    return prefixo
+    partes = [p for p in re.split(r'[_\-]+', nome_base) if p]
+    return ''.join(p.capitalize() for p in partes)
 
-def extrair_nome_predict(conteudo):
+
+def extrair_prefixo_macro(nome_arquivo):
     """
-    Procura por função predict_{nome} no código
+    dec_modelo.c -> DEC_MODELO ; reg_model.c -> REG_MODEL
+    (mantem os underscores, igual ao padrao de dec_modelo.h)
     """
-    padrao = re.compile(r'void\s+(predict_\w+)\s*\(')
-    match = padrao.search(conteudo)
-    if match:
-        return match.group(1)
+    nome_base = Path(nome_arquivo).stem
+    nome_base = re.sub(r'\.(c|h|cpp|hpp)$', '', nome_base)
+    partes = [p for p in re.split(r'[_\-]+', nome_base) if p]
+    return '_'.join(p.upper() for p in partes)
+
+
+# ----------------------------------------------------------------------
+# 3. Deteccao da assinatura e do tipo do modelo
+# ----------------------------------------------------------------------
+def detectar_assinatura(conteudo):
+    """
+    Descobre qual funcao gerada pelo m2cgen existe no arquivo.
+
+    Retorna dict:
+        {"forma": "vetor_saida"|"valor_unico", "nome": <nome da funcao>,
+         "retorno": "void"|"double"}
+    ou None se nada for encontrado.
+    """
+    # A) void nome(double * input, double * output)
+    padrao_vetor = re.compile(
+        r'\b(void)\s+(\w+)\s*\(\s*double\s*\*\s*\w+\s*,\s*double\s*\*\s*\w+\s*\)'
+    )
+    m = padrao_vetor.search(conteudo)
+    if m:
+        return {"forma": "vetor_saida", "nome": m.group(2), "retorno": "void"}
+
+    # B) double nome(double * input)
+    padrao_unico = re.compile(
+        r'\b(double)\s+(\w+)\s*\(\s*double\s*\*\s*\w+\s*\)'
+    )
+    m = padrao_unico.search(conteudo)
+    if m:
+        return {"forma": "valor_unico", "nome": m.group(2), "retorno": "double"}
+
     return None
 
-def renomear_funcao_score(conteudo, nome_antigo, nome_novo):
-    """
-    Renomeia a função de score no código
-    """
-    # Substitui a definição da função
-    padrao_def = re.compile(rf'void\s+{re.escape(nome_antigo)}\s*\(')
-    conteudo = padrao_def.sub(f'void {nome_novo}(', conteudo)
-    
-    # Substitui chamadas da função dentro do código
-    padrao_call = re.compile(rf'\b{re.escape(nome_antigo)}\s*\(')
-    conteudo = padrao_call.sub(f'{nome_novo}(', conteudo)
-    
-    return conteudo
 
+def detectar_tipo_modelo(conteudo, nome_arquivo, assinatura):
+    """
+    Deduz o tipo do modelo. Ordem de prioridade:
+      1. forma da assinatura (vetor de saida -> arvore);
+      2. codigo: exp()+pow() juntos indicam kernel RBF de SVM;
+      3. nome do arquivo.
+    """
+    nome = Path(nome_arquivo).stem.lower()
+
+    if assinatura and assinatura["forma"] == "vetor_saida":
+        return "arvore"
+
+    if 'svm' in nome:
+        return "svm"
+    if re.search(r'\bexp\s*\(', conteudo) and re.search(r'\bpow\s*\(', conteudo):
+        return "svm"
+
+    if 'log' in nome:
+        return "logistica"
+    if 'lin' in nome:
+        return "linear"
+    if 'reg' in nome:
+        # "reg_model" no projeto e a regressao logistica
+        return "logistica"
+    if any(t in nome for t in ('dec', 'tree', 'arvore', 'rf', 'forest')):
+        return "arvore"
+
+    # padrao mais seguro para modelos de valor unico
+    return "logistica"
+
+
+def renomear_funcao(conteudo, nome_antigo, nome_novo):
+    """
+    Renomeia a funcao (definicao e chamadas) preservando o tipo de retorno.
+    """
+    return re.sub(rf'\b{re.escape(nome_antigo)}\b', nome_novo, conteudo)
+
+
+# ----------------------------------------------------------------------
+# 4. Contagem de entradas / saidas
+# ----------------------------------------------------------------------
 def contar_indices_maximos(conteudo, nome_array):
-    """
-    Retorna o maior índice usado para o array 'nome_array' (ex.: 'input').
-    Se nenhum for encontrado, retorna 0.
-    """
-    padrao = re.compile(rf'{nome_array}\[(\d+)\]')
+    padrao = re.compile(rf'{nome_array}\[\s*(\d+)\s*\]')
     indices = [int(m) for m in padrao.findall(conteudo)]
-    if indices:
-        return max(indices) + 1   # quantidade = maior índice + 1
-    return 0
+    return max(indices) + 1 if indices else 0
 
-def extrair_informacoes_modelo(conteudo):
+
+def extrair_informacoes_modelo(conteudo, forma):
     """
-    Extrai informações sobre o modelo: número de entradas, saídas e se tem
-    a estrutura de árvore de decisão.
+    num_inputs: maior indice usado em input[] + 1
+    num_outputs: so faz sentido para modelos com vetor de saida
     """
-    num_inputs = contar_indices_maximos(conteudo, 'input')
-    num_outputs = contar_indices_maximos(conteudo, 'output')
-    
-    # Verifica se tem a estrutura de memcpy da árvore
-    tem_arvore = 'memcpy' in conteudo and 'if' in conteudo
-    
-    # Se não encontrou índices, assume valores padrão
-    if num_inputs == 0:
-        # Tenta contar quantas variáveis são usadas nos ifs
-        padrao_if = re.compile(r'input\[\s*(\d+)\s*\]')
-        indices_if = [int(m) for m in padrao_if.findall(conteudo)]
-        if indices_if:
-            num_inputs = max(indices_if) + 1
-        else:
-            num_inputs = 2  # Valor padrão para o exemplo
-    
-    if num_outputs == 0:
-        # Verifica se tem arrays com tamanho explícito
-        padrao_array = re.compile(r'double\s+\w+\[(\d+)\]')
-        tamanhos = [int(m) for m in padrao_array.findall(conteudo)]
-        if tamanhos:
-            # Pega o tamanho do array que parece ser de saída
-            for tam in tamanhos:
-                if tam >= 2:
-                    num_outputs = tam
-                    break
+    num_inputs = contar_indices_maximos(conteudo, 'input') or 2
+
+    if forma == "vetor_saida":
+        num_outputs = contar_indices_maximos(conteudo, 'output')
         if num_outputs == 0:
-            num_outputs = 2  # Valor padrão para o exemplo
-    
-    return num_inputs, num_outputs, tem_arvore
+            tamanhos = [int(m) for m in re.findall(r'double\s+\w+\[\s*(\d+)\s*\]', conteudo)]
+            num_outputs = next((t for t in tamanhos if t >= 2), 2)
+    else:
+        num_outputs = 1   # a funcao devolve um unico valor (return)
 
-def gerar_header(prefixo, num_inputs, num_outputs, classe_nao_liga=0, classe_liga=1):
-    """
-    Gera o conteúdo do arquivo .h com defines, comentários e protótipos.
-    """
-    header = f"""/**
+    return num_inputs, num_outputs
+
+
+# ----------------------------------------------------------------------
+# 5. Geracao do .h
+# ----------------------------------------------------------------------
+def _cabecalho_doc(nome_h, tipo):
+    return f"""/**
   ******************************************************************************
-  * @file           : {prefixo.lower()}.h
-  * @brief          : Interface do modelo de Machine Learning - Árvore de
-  *                    Decisão - ajustado via Controlador Fuzzy para decidir
-  *                    ligar ou não o GPRS da coleira de monitoramento de
+  * @file           : {nome_h}
+  * @brief          : Interface do modelo de Machine Learning - {DESCRICAO_TIPO[tipo]}
+  *                    - ajustado via Controlador Fuzzy para decidir
+  *                    ligar ou nao o GPRS da coleira de monitoramento de
   *                    animais silvestres, com base na carga da bateria e
   *                    na taxa de acerto no envio de dados via
-  *                    GPRS/satélite.
+  *                    GPRS/satelite.
   *
   * Portado via m2cgen do modelo treinado em Python (sklearn) para C puro.
   ******************************************************************************
-  */
-#ifndef {prefixo.upper()}_H
-#define {prefixo.upper()}_H
+  */"""
+
+
+def gerar_header_vetor_saida(nome_h, prefixo, macro, num_inputs, num_outputs, tipo):
+    """
+    Header dos modelos que devolvem vetor de pertinencia por classe.
+    """
+    return f"""{_cabecalho_doc(nome_h, tipo)}
+#ifndef {macro}_H
+#define {macro}_H
 
 #ifdef __cplusplus
 extern "C" {{
 #endif
 
-/* Número de features de entrada do modelo */
-#define {prefixo.upper()}_NUM_INPUTS  {num_inputs}
-/* Número de classes de saída (pertinência/probabilidade de cada classe) */
-#define {prefixo.upper()}_NUM_OUTPUTS {num_outputs}
+/* Numero de features de entrada do modelo */
+#define {macro}_NUM_INPUTS  {num_inputs}
+/* Numero de classes de saida (pertinencia/probabilidade de cada classe) */
+#define {macro}_NUM_OUTPUTS {num_outputs}
 
-/* Índices das classes no vetor de saída de score() */
-#define {prefixo.upper()}_CLASSE_NAO_LIGA {classe_nao_liga}
-#define {prefixo.upper()}_CLASSE_LIGA     {classe_liga}
+/* Indices das classes no vetor de saida de score() */
+#define {macro}_CLASSE_NAO_LIGA {CLASSE_NAO_LIGA}
+#define {macro}_CLASSE_LIGA     {CLASSE_LIGA}
 
 /**
- * @brief  Executa a árvore de decisão (portada via m2cgen do modelo
- *         treinado em Python/sklearn) e retorna a pertinência de cada
- *         classe.
- * @param  input:  vetor com {prefixo.upper()}_NUM_INPUTS valores de entrada, na
- *                 mesma ordem/escala usada no treinamento do modelo
- *                 (verifique o script Python de treinamento/exportação
- *                 para confirmar a ordem exata das features).
- * @param  output: vetor de saída com {prefixo.upper()}_NUM_OUTPUTS valores;
- *                 output[{prefixo.upper()}_CLASSE_NAO_LIGA] e
- *                 output[{prefixo.upper()}_CLASSE_LIGA] somam 1.0
+ * @brief  Executa o modelo (portado via m2cgen do modelo treinado em
+ *         Python/sklearn) e retorna a pertinencia de cada classe.
+ * @param  input:  vetor com {macro}_NUM_INPUTS valores de entrada, na
+ *                 mesma ordem/escala usada no treinamento do modelo.
+ * @param  output: vetor de saida com {macro}_NUM_OUTPUTS valores;
+ *                 output[{macro}_CLASSE_NAO_LIGA] e
+ *                 output[{macro}_CLASSE_LIGA] somam 1.0
  */
 void {prefixo}_Score(double *input, double *output);
 
 /**
- * @brief  Wrapper de conveniência: executa o modelo e retorna diretamente
- *         a decisão binária, comparando a pertinência de cada classe.
+ * @brief  Wrapper de conveniencia: executa o modelo e retorna diretamente
+ *         a decisao binaria, comparando a pertinencia de cada classe.
  * @param  bateria_pct: percentual de carga da bateria (0-100)
  * @param  taxa_normalizada: taxa de acerto normalizada (0-100)
- * @retval 1 se o GPRS deve ser ligado, 0 caso contrário
+ * @retval 1 se o GPRS deve ser ligado, 0 caso contrario
  */
 int {prefixo}_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
 
@@ -206,159 +252,344 @@ int {prefixo}_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
 }}
 #endif
 
-#endif /* {prefixo.upper()}_H */
+#endif /* {macro}_H */
 """
-    return header
 
-def gerar_wrapper_c(prefixo, num_inputs):
+
+DOC_SCORE_VALOR_UNICO = {
+    "logistica": ("logit (soma linear antes da sigmoide) calculado pelo\n"
+                  " *         modelo de regressao logistica"),
+    "linear": "valor previsto pelo modelo de regressao linear",
+    "svm": ("valor da funcao de decisao do SVM (distancia com sinal\n"
+            " *         ate o hiperplano separador)"),
+}
+
+DOC_PROB_VALOR_UNICO = {
+    "logistica": ("Converte o logit em probabilidade aplicando a funcao\n"
+                  " *         sigmoide: 1 / (1 + exp(-logit))."),
+    "linear": ("Converte o valor previsto em probabilidade saturando-o\n"
+               " *         no intervalo [0, 1] (a regressao linear ja estima\n"
+               " *         diretamente o alvo, mas pode extrapolar)."),
+    "svm": ("Converte a margem da funcao de decisao em pseudo-\n"
+            " *         probabilidade aplicando a sigmoide (Platt scaling\n"
+            " *         simplificado): 1 / (1 + exp(-decisao))."),
+}
+
+
+def gerar_header_valor_unico(nome_h, prefixo, macro, num_inputs, tipo, threshold):
     """
-    Gera o código da função wrapper a ser inserida no .c.
-    O wrapper assume que o modelo tem exatamente 2 entradas (bateria e taxa).
-    Caso num_inputs != 2, gera um wrapper genérico com array.
+    Header dos modelos que devolvem um unico valor (logistica, linear, SVM).
     """
-    if num_inputs == 2:
-        return f"""
-int {prefixo}_DecideLigarGPRS(float bateria_pct, float taxa_normalizada)
+    return f"""{_cabecalho_doc(nome_h, tipo)}
+#ifndef {macro}_H
+#define {macro}_H
+
+#ifdef __cplusplus
+extern "C" {{
+#endif
+
+/* Numero de features de entrada do modelo */
+#define {macro}_NUM_INPUTS  {num_inputs}
+
+/* Limite de decisao: probabilidade a partir da qual o GPRS e ligado */
+#define {macro}_THRESHOLD {threshold}
+
+/**
+ * @brief  Executa o modelo (portado via m2cgen do modelo treinado em
+ *         Python/sklearn) e retorna o {DOC_SCORE_VALOR_UNICO[tipo]}.
+ * @param  input: vetor com {macro}_NUM_INPUTS valores de entrada, na
+ *                mesma ordem/escala usada no treinamento do modelo.
+ * @retval valor bruto devolvido pelo modelo (nao e uma probabilidade)
+ */
+double {prefixo}_Score(double *input);
+
+/**
+ * @brief  {DOC_PROB_VALOR_UNICO[tipo]}
+ * @param  input: vetor com {macro}_NUM_INPUTS valores de entrada
+ * @retval probabilidade, no intervalo [0, 1], de o GPRS ser ligado
+ */
+double {prefixo}_Probabilidade(double *input);
+
+/**
+ * @brief  Wrapper de conveniencia: executa o modelo e retorna diretamente
+ *         a decisao binaria, comparando a probabilidade com
+ *         {macro}_THRESHOLD.
+ * @param  bateria_pct: percentual de carga da bateria (0-100)
+ * @param  taxa_normalizada: taxa de acerto normalizada (0-100)
+ * @retval 1 se o GPRS deve ser ligado, 0 caso contrario
+ */
+int {prefixo}_DecideLigarGPRS(float bateria_pct, float taxa_normalizada);
+
+#ifdef __cplusplus
+}}
+#endif
+
+#endif /* {macro}_H */
+"""
+
+
+# ----------------------------------------------------------------------
+# 6. Geracao do codigo C (Probabilidade + wrapper)
+# ----------------------------------------------------------------------
+def gerar_probabilidade_c(prefixo, tipo):
+    """
+    Funcao de probabilidade ADEQUADA AO TIPO do modelo de valor unico.
+    """
+    if tipo == "logistica":
+        return f"""double {prefixo}_Probabilidade(double *input)
 {{
-    double input[{prefixo.upper()}_NUM_INPUTS];
-    double output[{prefixo.upper()}_NUM_OUTPUTS];
+    double logit = {prefixo}_Score(input);
+    return 1.0 / (1.0 + exp(-logit));
+}}
+"""
+
+    if tipo == "svm":
+        return f"""double {prefixo}_Probabilidade(double *input)
+{{
+    /* A funcao de decisao do SVM devolve a margem (distancia com sinal ate
+       o hiperplano). A sigmoide converte essa margem em pseudo-
+       probabilidade (Platt scaling simplificado, A = -1 e B = 0). */
+    double decisao = {prefixo}_Score(input);
+    return 1.0 / (1.0 + exp(-decisao));
+}}
+"""
+
+    if tipo == "linear":
+        return f"""double {prefixo}_Probabilidade(double *input)
+{{
+    /* A regressao linear ja estima diretamente o alvo (0 a 1), mas pode
+       extrapolar; por isso o valor e saturado no intervalo [0, 1]. */
+    double valor = {prefixo}_Score(input);
+
+    if (valor < 0.0)
+    {{
+        valor = 0.0;
+    }}
+    if (valor > 1.0)
+    {{
+        valor = 1.0;
+    }}
+
+    return valor;
+}}
+"""
+
+    raise ValueError(f"tipo sem funcao de probabilidade definida: {tipo}")
+
+
+def gerar_wrapper_vetor_saida(prefixo, macro):
+    return f"""int {prefixo}_DecideLigarGPRS(float bateria_pct, float taxa_normalizada)
+{{
+    double input[{macro}_NUM_INPUTS];
+    double output[{macro}_NUM_OUTPUTS];
 
     input[0] = (double)bateria_pct;
     input[1] = (double)taxa_normalizada;
 
     {prefixo}_Score(input, output);
 
-    return (output[{prefixo.upper()}_CLASSE_LIGA] > output[{prefixo.upper()}_CLASSE_NAO_LIGA]) ? 1 : 0;
-}}
-"""
-    else:
-        # Wrapper genérico para número arbitrário de entradas (mas ainda com 2 saídas)
-        return f"""
-int {prefixo}_DecideLigarGPRS(double *input)
-{{
-    double output[{prefixo.upper()}_NUM_OUTPUTS];
-    {prefixo}_Score(input, output);
-    return (output[{prefixo.upper()}_CLASSE_LIGA] > output[{prefixo.upper()}_CLASSE_NAO_LIGA]) ? 1 : 0;
+    return (output[{macro}_CLASSE_LIGA] > output[{macro}_CLASSE_NAO_LIGA]) ? 1 : 0;
 }}
 """
 
+
+def gerar_wrapper_valor_unico(prefixo, macro):
+    return f"""int {prefixo}_DecideLigarGPRS(float bateria_pct, float taxa_normalizada)
+{{
+    double input[{macro}_NUM_INPUTS];
+
+    input[0] = (double)bateria_pct;
+    input[1] = (double)taxa_normalizada;
+
+    return ({prefixo}_Probabilidade(input) >= {macro}_THRESHOLD) ? 1 : 0;
+}}
+"""
+
+
 # ----------------------------------------------------------------------
-# 3. Função principal
+# 7. Edicao do .c
+# ----------------------------------------------------------------------
+def garantir_include(conteudo, linha_include, no_topo=False):
+    """
+    Garante que 'linha_include' exista no arquivo. Com no_topo=True coloca
+    antes de qualquer outro include (padrao usado para o proprio .h).
+    """
+    if linha_include in conteudo:
+        return conteudo, False
+
+    if no_topo:
+        return linha_include + "\n" + conteudo, True
+
+    ultimo = None
+    for m in re.finditer(r'^#include\s+.*$', conteudo, re.MULTILINE):
+        ultimo = m
+    if ultimo:
+        pos = ultimo.end()
+        return conteudo[:pos] + "\n" + linha_include + conteudo[pos:], True
+    return linha_include + "\n" + conteudo, True
+
+
+def localizar_funcao(conteudo, nome):
+    """
+    Devolve (inicio, fim) da definicao completa de 'nome' (assinatura +
+    corpo, via contagem de chaves) ou None se nao existir.
+    """
+    m = re.search(rf'^[^\n;]*\b{re.escape(nome)}\s*\([^;{{}}]*\)\s*\n?\{{',
+                  conteudo, re.MULTILINE)
+    if not m:
+        return None
+
+    inicio = conteudo.rfind("\n", 0, m.start()) + 1
+    profundidade = 0
+    for i in range(conteudo.index("{", m.start()), len(conteudo)):
+        if conteudo[i] == "{":
+            profundidade += 1
+        elif conteudo[i] == "}":
+            profundidade -= 1
+            if profundidade == 0:
+                return inicio, i + 1
+    return None
+
+
+def inserir_ou_substituir_funcao(conteudo, nome, codigo):
+    """
+    Substitui a definicao existente da funcao (se houver) ou acrescenta o
+    codigo ao final do arquivo. Nunca duplica.
+    """
+    intervalo = localizar_funcao(conteudo, nome)
+    if intervalo:
+        inicio, fim = intervalo
+        return conteudo[:inicio] + codigo.rstrip("\n") + conteudo[fim:], "substituida"
+    return conteudo.rstrip("\n") + "\n\n" + codigo, "adicionada"
+
+
+# ----------------------------------------------------------------------
+# 8. Processamento de um arquivo
+# ----------------------------------------------------------------------
+def processar(caminho_c, tipo_forcado=None, threshold=THRESHOLD_PADRAO, backup=True):
+    original = caminho_c.read_text(encoding='utf-8')
+    conteudo = original.replace('\r\n', '\n')
+
+    assinatura = detectar_assinatura(conteudo)
+    if assinatura is None:
+        print(f"[{caminho_c}] ERRO: nenhuma funcao do m2cgen encontrada "
+              f"(esperado 'void f(double*, double*)' ou 'double f(double*)').")
+        return False
+
+    prefixo = FORCAR_PREFIXO or extrair_prefixo_do_nome_arquivo(caminho_c.name)
+    macro = extrair_prefixo_macro(caminho_c.name)
+
+    tipo = tipo_forcado or detectar_tipo_modelo(conteudo, caminho_c.name, assinatura)
+    if tipo not in TIPOS_SUPORTADOS:
+        print(f"[{caminho_c}] ERRO: tipo '{tipo}' desconhecido.")
+        return False
+
+    # coerencia entre tipo pedido e assinatura encontrada
+    if tipo == "arvore" and assinatura["forma"] != "vetor_saida":
+        print(f"[{caminho_c}] AVISO: tipo 'arvore' pedido, mas a funcao devolve um "
+              f"unico valor; tratando como 'logistica'.")
+        tipo = "logistica"
+    if tipo in TIPOS_VALOR_UNICO and assinatura["forma"] == "vetor_saida":
+        print(f"[{caminho_c}] AVISO: tipo '{tipo}' pedido, mas a funcao tem vetor de "
+              f"saida; tratando como 'arvore'.")
+        tipo = "arvore"
+
+    print(f"[{caminho_c}]")
+    print(f"  - funcao do m2cgen: {assinatura['retorno']} {assinatura['nome']}(...) "
+          f"({'vetor de saida' if assinatura['forma'] == 'vetor_saida' else 'valor unico'})")
+    print(f"  - tipo do modelo: {tipo} ({DESCRICAO_TIPO[tipo]})")
+    print(f"  - prefixos: funcao '{prefixo}_*' / macro '{macro}_*'")
+
+    # 1) renomeia a funcao do m2cgen para {Prefixo}_Score
+    nome_score = f"{prefixo}_Score"
+    if assinatura["nome"] != nome_score:
+        conteudo = renomear_funcao(conteudo, assinatura["nome"], nome_score)
+        print(f"  - '{assinatura['nome']}' renomeada para '{nome_score}'")
+
+    # 2) conta entradas/saidas
+    num_inputs, num_outputs = extrair_informacoes_modelo(conteudo, assinatura["forma"])
+    print(f"  - entradas: {num_inputs}" +
+          (f", saidas: {num_outputs}" if assinatura["forma"] == "vetor_saida" else ""))
+
+    # 3) gera o .h
+    caminho_h = caminho_c.with_suffix('.h')
+    if assinatura["forma"] == "vetor_saida":
+        header = gerar_header_vetor_saida(caminho_h.name, prefixo, macro,
+                                          num_inputs, num_outputs, tipo)
+    else:
+        header = gerar_header_valor_unico(caminho_h.name, prefixo, macro,
+                                          num_inputs, tipo, threshold)
+    with open(caminho_h, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(header)
+    print(f"  - '{caminho_h.name}' gerado")
+
+    # 4) includes: o proprio .h no topo; <math.h> quando a matematica exige
+    conteudo, add = garantir_include(conteudo, f'#include "{caminho_h.name}"', no_topo=True)
+    if add:
+        print(f"  - '#include \"{caminho_h.name}\"' adicionado")
+
+    precisa_math = (tipo in ("logistica", "svm")
+                    or re.search(r'\b(exp|pow|sqrt|log)\s*\(', conteudo) is not None)
+    if precisa_math:
+        conteudo, add = garantir_include(conteudo, '#include <math.h>')
+        if add:
+            print("  - '#include <math.h>' adicionado")
+
+    # 5) funcao Probabilidade (somente modelos de valor unico)
+    if assinatura["forma"] == "valor_unico":
+        nome_prob = f"{prefixo}_Probabilidade"
+        conteudo, acao = inserir_ou_substituir_funcao(
+            conteudo, nome_prob, gerar_probabilidade_c(prefixo, tipo))
+        print(f"  - '{nome_prob}' {acao} (calculo do tipo '{tipo}')")
+
+    # 6) wrapper de decisao binaria
+    nome_wrapper = f"{prefixo}_DecideLigarGPRS"
+    codigo_wrapper = (gerar_wrapper_vetor_saida(prefixo, macro)
+                      if assinatura["forma"] == "vetor_saida"
+                      else gerar_wrapper_valor_unico(prefixo, macro))
+    conteudo, acao = inserir_ou_substituir_funcao(conteudo, nome_wrapper, codigo_wrapper)
+    print(f"  - '{nome_wrapper}' {acao}")
+
+    # 7) salva (com backup opcional)
+    if backup:
+        destino_bak = Path(str(caminho_c) + '.bak')
+        with open(destino_bak, 'w', encoding='utf-8', newline='') as f:
+            f.write(original)
+        print(f"  - backup em '{destino_bak.name}'")
+    with open(caminho_c, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(conteudo.rstrip('\n') + '\n')
+    print(f"  - '{caminho_c.name}' modificado")
+    return True
+
+
+# ----------------------------------------------------------------------
+# 9. Main
 # ----------------------------------------------------------------------
 def main():
-    if len(sys.argv) < 2:
-        print("Uso: python gerar_wrapper_m2cgen.py arquivo_modelo.c")
-        sys.exit(1)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("arquivos", nargs="+", help="arquivo(s) .c gerado(s) pelo m2cgen")
+    ap.add_argument("--tipo", choices=TIPOS_SUPORTADOS, default=None,
+                    help="forca o tipo do modelo (recomendado para distinguir "
+                         "regressao linear de logistica)")
+    ap.add_argument("--threshold", default=THRESHOLD_PADRAO,
+                    help=f"limite de decisao dos modelos de valor unico "
+                         f"(padrao {THRESHOLD_PADRAO})")
+    ap.add_argument("--sem-backup", action="store_true", help="nao gerar arquivo .c.bak")
+    args = ap.parse_args()
 
-    caminho_c = Path(sys.argv[1])
-    if not caminho_c.is_file():
-        print(f"Erro: arquivo '{caminho_c}' não encontrado.")
-        sys.exit(1)
+    ok = True
+    for nome in args.arquivos:
+        caminho = Path(nome)
+        if not caminho.is_file():
+            print(f"[{caminho}] ERRO: arquivo nao encontrado.")
+            ok = False
+            continue
+        if not processar(caminho, args.tipo, args.threshold, backup=not args.sem_backup):
+            ok = False
 
-    # Lê o conteúdo do .c
-    with open(caminho_c, 'r', encoding='utf-8') as f:
-        conteudo = f.read()
+    sys.exit(0 if ok else 1)
 
-    # 1. Verifica se existe função predict_{nome}
-    nome_predict = extrair_nome_predict(conteudo)
-    
-    # 2. Extrai ou define o prefixo
-    if FORCAR_PREFIXO:
-        prefixo = FORCAR_PREFIXO
-        print(f"Prefixo forçado: {prefixo}")
-    else:
-        # Tenta extrair do nome da função score
-        nome_score = extrair_nome_funcao_score(conteudo)
-        if nome_score:
-            if nome_score.startswith('predict_'):
-                # Extrai prefixo do nome do arquivo
-                prefixo = extrair_prefixo_do_nome_arquivo(caminho_c.name)
-                print(f"Função predict encontrada. Prefixo inferido do nome do arquivo: {prefixo}")
-            else:
-                prefixo = nome_score.replace('_Score', '')
-                print(f"Prefixo identificado da função _Score: {prefixo}")
-        else:
-            # Se não encontrou nenhuma função, usa o nome do arquivo
-            prefixo = extrair_prefixo_do_nome_arquivo(caminho_c.name)
-            print(f"Nenhuma função _Score encontrada. Prefixo inferido do nome do arquivo: {prefixo}")
-
-    # 3. Renomeia a função predict para {prefixo}_Score se necessário
-    if nome_predict and nome_predict != f"{prefixo}_Score":
-        print(f"Renomeando função '{nome_predict}' para '{prefixo}_Score'")
-        conteudo = renomear_funcao_score(conteudo, nome_predict, f"{prefixo}_Score")
-        
-        # Atualiza nome_score para o novo nome
-        nome_score = f"{prefixo}_Score"
-    else:
-        # Verifica se já existe {prefixo}_Score
-        if f"{prefixo}_Score" not in conteudo:
-            print(f"Aviso: Função '{prefixo}_Score' não encontrada no arquivo.")
-            # Tenta encontrar qualquer função com Score
-            nome_score = extrair_nome_funcao_score(conteudo)
-            if nome_score:
-                print(f"Encontrada função alternativa: {nome_score}")
-                # Renomeia para o padrão
-                if nome_score != f"{prefixo}_Score":
-                    conteudo = renomear_funcao_score(conteudo, nome_score, f"{prefixo}_Score")
-                    nome_score = f"{prefixo}_Score"
-        else:
-            nome_score = f"{prefixo}_Score"
-
-    # 4. Extrai informações do modelo
-    num_inputs, num_outputs, tem_arvore = extrair_informacoes_modelo(conteudo)
-    
-    # Se não encontrou a estrutura de árvore, usa valores padrão
-    if num_inputs == 0:
-        num_inputs = 2
-    if num_outputs == 0:
-        num_outputs = 2
-        
-    print(f"Entradas: {num_inputs}, Saídas: {num_outputs}")
-    print(f"Estrutura de árvore encontrada: {tem_arvore}")
-
-    # 5. Cria o conteúdo do .h
-    header_content = gerar_header(prefixo, num_inputs, num_outputs)
-
-    # 6. Cria o arquivo .h
-    nome_h = caminho_c.with_suffix('.h')
-    with open(nome_h, 'w', encoding='utf-8') as f:
-        f.write(header_content)
-    print(f"Arquivo '{nome_h}' gerado.")
-
-    # 7. Modifica o .c
-    # 7a. Verifica se o include do .h já existe
-    include_str = f'#include "{nome_h.name}"'
-    if include_str not in conteudo:
-        # Insere após o último include existente
-        linhas = conteudo.splitlines()
-        novo_conteudo = []
-        include_adicionado = False
-        for linha in linhas:
-            novo_conteudo.append(linha)
-            if not include_adicionado and linha.startswith('#include'):
-                # Insere após este include
-                novo_conteudo.append(include_str)
-                include_adicionado = True
-        if not include_adicionado:
-            # Se não houver nenhum include, coloca no início
-            novo_conteudo = [include_str, ''] + linhas
-        conteudo = '\n'.join(novo_conteudo)
-
-    # 7b. Adiciona a função wrapper no final (se já não existir)
-    wrapper_func_name = f"{prefixo}_DecideLigarGPRS"
-    if wrapper_func_name not in conteudo:
-        wrapper_code = gerar_wrapper_c(prefixo, num_inputs)
-        conteudo += '\n' + wrapper_code
-        print(f"Função '{wrapper_func_name}' adicionada ao arquivo.")
-    else:
-        print(f"Aviso: a função '{wrapper_func_name}' já existe no arquivo. Não será adicionada novamente.")
-
-    # 7c. Salva o .c modificado (faz backup)
-    backup = caminho_c.with_suffix('.c.bak')
-    caminho_c.rename(backup)
-    with open(caminho_c, 'w', encoding='utf-8') as f:
-        f.write(conteudo)
-    print(f"Arquivo '{caminho_c}' modificado. Backup salvo em '{backup}'.")
 
 if __name__ == '__main__':
     main()

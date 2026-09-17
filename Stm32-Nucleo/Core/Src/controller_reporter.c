@@ -4,6 +4,8 @@
 #include "fuzzy-controller.h"
 #include "reg_model.h"
 #include "dec_model.h"
+#include "svm_model.h"
+#include "lgb_model.h"
 
 int ControllerReporter_InitController(ControllerType type)
 {
@@ -28,6 +30,21 @@ int ControllerReporter_InitController(ControllerType type)
             ControllerReporter_ReportCreation(CTRL_TYPE_LOGISTIC, (ret == 0));
             break;
         }
+
+        case CTRL_TYPE_SVM:
+        {
+            /* svm_modelo é stateless (apenas combinação de funções exponenciais):
+             * não há o que alocar/montar como no fuzzy. "Inicializar" aqui
+             * significa validar que o modelo responde corretamente a uma
+             * entrada de referência antes de liberá-lo para uso. */
+            double input[SVM_MODEL_NUM_INPUTS] = {50.0, 50.0};
+            double prob = SvmModel_Probabilidade(input);
+
+            ret = (prob >= 0.0 && prob <= 1.0) ? 0 : -1;
+            ControllerReporter_ReportCreation(CTRL_TYPE_SVM, (ret == 0));
+            break;
+        }
+
         case CTRL_TYPE_DECISION_TREE:
         {
             /* dec_modelo também é stateless: validamos que as duas
@@ -44,6 +61,22 @@ int ControllerReporter_InitController(ControllerType type)
             ControllerReporter_ReportCreation(CTRL_TYPE_DECISION_TREE, (ret == 0));
             break;
         }
+        case CTRL_TYPE_LGB:
+        {
+            /* lgb_model tambem e stateless: validamos que as
+             * probabilidades de classe somam ~1.0 para uma entrada de
+             * referencia. */
+            double input[LGB_MODEL_NUM_INPUTS] = {50.0, 50.0};
+            double output[LGB_MODEL_NUM_OUTPUTS];
+            double soma;
+
+            LgbModel_Score(input, output);
+            soma = output[LGB_MODEL_CLASSE_NAO_LIGA] + output[LGB_MODEL_CLASSE_LIGA];
+
+            ret = (soma > 0.99 && soma < 1.01) ? 0 : -1;
+            ControllerReporter_ReportCreation(CTRL_TYPE_LGB, (ret == 0));
+            break;
+        }
         default:
             ControllerReporter_ReportCreation(CTRL_TYPE_OTHER, 0);
             ret = -1;
@@ -58,8 +91,9 @@ void ControllerReporter_ReportCreation(ControllerType type, int success)
     switch (type)
     {
         case CTRL_TYPE_FUZZY: name = "Fuzzy"; break;
-        // case CTRL_TYPE_LOGISTIC: name = "LogisticRegression"; break;
+        case CTRL_TYPE_LOGISTIC: name = "LogisticRegression"; break;
         case CTRL_TYPE_DECISION_TREE: name = "DecisionTree"; break;
+        case CTRL_TYPE_LGB: name = "Lgb"; break;
         default: name = "OtherController"; break;
     }
 

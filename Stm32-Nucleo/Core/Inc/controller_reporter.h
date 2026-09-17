@@ -11,7 +11,10 @@ typedef enum {
     CTRL_TYPE_FUZZY = 0,
     CTRL_TYPE_LOGISTIC,
     CTRL_TYPE_DECISION_TREE,
+    CTRL_TYPE_SVM,
+    CTRL_TYPE_LGB,
     CTRL_TYPE_OTHER,
+
 } ControllerType;
 
 /* Inicializa e reporta (chamada de alto nível). Retorna 0 em sucesso, -1 em falha. */
