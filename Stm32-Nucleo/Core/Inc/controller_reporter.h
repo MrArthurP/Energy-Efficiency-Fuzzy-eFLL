@@ -13,6 +13,7 @@ typedef enum {
     CTRL_TYPE_DECISION_TREE,
     CTRL_TYPE_SVM,
     CTRL_TYPE_LGB,
+    CTRL_TYPE_RFR,
     CTRL_TYPE_OTHER,
 
 } ControllerType;

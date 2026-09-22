@@ -1,3 +1,4 @@
+#include "rfr_model.h"
 #include <string.h>
 void add_vectors(double *v1, double *v2, int size, double *result) {
     for(int i = 0; i < size; ++i)
@@ -7,7 +8,7 @@ void mul_vector_number(double *v1, double num, int size, double *result) {
     for(int i = 0; i < size; ++i)
         result[i] = v1[i] * num;
 }
-void predict_rfr_model(double * input, double * output) {
+void RfrModel_Score(double * input, double * output) {
     double var0[2];
     double var1[2];
     double var2[2];
@@ -1145,4 +1146,17 @@ void predict_rfr_model(double * input, double * output) {
     add_vectors(var2, var47, 2, var1);
     mul_vector_number(var1, 0.041666666666666664, 2, var0);
     memcpy(output, var0, 2 * sizeof(double));
+}
+
+int RfrModel_DecideLigarGPRS(float bateria_pct, float taxa_normalizada)
+{
+    double input[RFR_MODEL_NUM_INPUTS];
+    double output[RFR_MODEL_NUM_OUTPUTS];
+
+    input[0] = (double)bateria_pct;
+    input[1] = (double)taxa_normalizada;
+
+    RfrModel_Score(input, output);
+
+    return (output[RFR_MODEL_CLASSE_LIGA] > output[RFR_MODEL_CLASSE_NAO_LIGA]) ? 1 : 0;
 }

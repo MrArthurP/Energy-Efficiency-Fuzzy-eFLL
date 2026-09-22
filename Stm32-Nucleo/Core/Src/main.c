@@ -30,6 +30,7 @@
 #include "dec_model.h"
 #include "svm_model.h"
 #include "lgb_model.h"
+#include "rfr_model.h"
 /* SERIAL MONITOR includes */
 #include "serial_logger.h"
 /* CONTROLLER INIT REPORTER AND EVALUATION includes */
@@ -142,7 +143,7 @@ int main(void)
   ControllerProfiler_Init();
 
   /* Inicializa e reporta os controladores (Fuzzy, Logistic e DecisionTree) */
-  if (ControllerReporter_InitController(CTRL_TYPE_DECISION_TREE) != 0 || ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0 || ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0 || ControllerReporter_InitController(CTRL_TYPE_SVM) !=0)
+  if (ControllerReporter_InitController(CTRL_TYPE_DECISION_TREE) != 0 || ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0 || ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0 || ControllerReporter_InitController(CTRL_TYPE_SVM) !=0 || ControllerReporter_InitController(CTRL_TYPE_LGB) !=0 || ControllerReporter_InitController(CTRL_TYPE_RFR) !=0 )
   {
     Error_Handler();
   }
@@ -161,7 +162,8 @@ int main(void)
   ControllerProfiler_MedirEReportar("SVM",            SvmModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("LGB",            LgbModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-  
+  ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -186,6 +188,7 @@ int main(void)
       ControllerProfiler_MedirEReportar("SVM",            SvmModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("LGB",            LgbModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
 
     } 
 
@@ -250,6 +253,7 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 #ifdef USE_FULL_ASSERT
+
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
@@ -257,6 +261,7 @@ void Error_Handler(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
+
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

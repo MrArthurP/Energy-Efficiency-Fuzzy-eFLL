@@ -6,6 +6,7 @@
 #include "dec_model.h"
 #include "svm_model.h"
 #include "lgb_model.h"
+#include "rfr_model.h"
 
 int ControllerReporter_InitController(ControllerType type)
 {
@@ -77,6 +78,22 @@ int ControllerReporter_InitController(ControllerType type)
             ControllerReporter_ReportCreation(CTRL_TYPE_LGB, (ret == 0));
             break;
         }
+        case CTRL_TYPE_RFR:
+        {
+            /* rfr_model tambem e stateless: validamos que as
+             * probabilidades de classe somam ~1.0 para uma entrada de
+             * referencia. */
+            double input[RFR_MODEL_NUM_INPUTS] = {50.0, 50.0};
+            double output[RFR_MODEL_NUM_OUTPUTS];
+            double soma;
+
+            RfrModel_Score(input, output);
+            soma = output[RFR_MODEL_CLASSE_NAO_LIGA] + output[RFR_MODEL_CLASSE_LIGA];
+
+            ret = (soma > 0.99 && soma < 1.01) ? 0 : -1;
+            ControllerReporter_ReportCreation(CTRL_TYPE_RFR, (ret == 0));
+            break;
+        }
         default:
             ControllerReporter_ReportCreation(CTRL_TYPE_OTHER, 0);
             ret = -1;
@@ -94,6 +111,7 @@ void ControllerReporter_ReportCreation(ControllerType type, int success)
         case CTRL_TYPE_LOGISTIC: name = "LogisticRegression"; break;
         case CTRL_TYPE_DECISION_TREE: name = "DecisionTree"; break;
         case CTRL_TYPE_LGB: name = "Lgb"; break;
+        case CTRL_TYPE_RFR: name = "Rfr"; break;
         default: name = "OtherController"; break;
     }
 
