@@ -14,6 +14,9 @@ typedef enum {
     CTRL_TYPE_SVM,
     CTRL_TYPE_LGB,
     CTRL_TYPE_RFR,
+    CTRL_TYPE_QDA,
+    CTRL_TYPE_NNW,
+    CTRL_TYPE_NBA,
     CTRL_TYPE_OTHER,
 
 } ControllerType;

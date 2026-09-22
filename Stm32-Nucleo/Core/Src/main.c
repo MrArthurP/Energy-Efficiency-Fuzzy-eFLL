@@ -143,7 +143,7 @@ int main(void)
   ControllerProfiler_Init();
 
   /* Inicializa e reporta os controladores (Fuzzy, Logistic e DecisionTree) */
-  if (ControllerReporter_InitController(CTRL_TYPE_DECISION_TREE) != 0 || ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0 || ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0 || ControllerReporter_InitController(CTRL_TYPE_SVM) !=0 || ControllerReporter_InitController(CTRL_TYPE_LGB) !=0 || ControllerReporter_InitController(CTRL_TYPE_RFR) !=0 )
+  if (ControllerReporter_InitController(CTRL_TYPE_DECISION_TREE) != 0 || ControllerReporter_InitController(CTRL_TYPE_FUZZY) != 0 || ControllerReporter_InitController(CTRL_TYPE_LOGISTIC) != 0 || ControllerReporter_InitController(CTRL_TYPE_SVM) !=0 || ControllerReporter_InitController(CTRL_TYPE_LGB) !=0 || ControllerReporter_InitController(CTRL_TYPE_RFR) !=0 || ControllerReporter_InitController(CTRL_TYPE_QDA) !=0 || ControllerReporter_InitController(CTRL_TYPE_NNW) !=0 || ControllerReporter_InitController(CTRL_TYPE_NBA) !=0)
   {
     Error_Handler();
   }
@@ -163,7 +163,9 @@ int main(void)
   ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("LGB",            LgbModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-
+  ControllerProfiler_MedirEReportar("QDA",            QdaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  ControllerProfiler_MedirEReportar("NNW",            NnwModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -189,7 +191,9 @@ int main(void)
       ControllerProfiler_MedirEReportar("ArvoreDecisao",  DecModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("LGB",            LgbModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-
+      ControllerProfiler_MedirEReportar("QDA",            QdaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      ControllerProfiler_MedirEReportar("NNW",            NnwModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
     } 
 
     /* USER CODE BEGIN 3 */

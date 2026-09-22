@@ -62,25 +62,26 @@ NOME_REPORTER_C = "controller_reporter.c"
 SUFIXOS_MACRO = ("NUM_INPUTS", "NUM_OUTPUTS", "CLASSE_LIGA",
                  "CLASSE_NAO_LIGA", "THRESHOLD")
 
-# sufixo comum que e removido do nome do arquivo ao formar o enum/rotulo
-# (ex.: "lgb_model.h" -> "lgb" -> CTRL_TYPE_LGB, rotulo "Lgb")
-SUFIXOS_ARQUIVO_IGNORADOS = ("model", "modelo")
+# sufixos removidos do final do nome do arquivo ao formar o enum/rotulo,
+# removidos ITERATIVAMENTE (ex.: "nba_model_wrapper.h" -> "nba_model" ->
+# "nba" -> CTRL_TYPE_NBA)
+SUFIXOS_ARQUIVO_IGNORADOS = ("model", "modelo", "wrapper")
 
 
 def derivar_enum_e_rotulo(nome_arquivo_h):
     """
     Deduz o nome do enum e o rotulo do log a partir do NOME DO ARQUIVO .h,
-    removendo um sufixo final "_model"/"_modelo" quando presente:
+    removendo sufixos finais "_model"/"_modelo"/"_wrapper" quando presentes
+    (removidos um a um, do fim para o comeco):
 
-        lgb_model.h  -> enum CTRL_TYPE_LGB       rotulo "Lgb"
-        dec_model.h  -> enum CTRL_TYPE_DEC       rotulo "Dec"
-        reg_model.h  -> enum CTRL_TYPE_REG       rotulo "Reg"
-        svm_model.h  -> enum CTRL_TYPE_SVM       rotulo "Svm"
-        outro.h      -> enum CTRL_TYPE_OUTRO     rotulo "Outro"
+        lgb_model.h         -> enum CTRL_TYPE_LGB       rotulo "Lgb"
+        dec_model.h         -> enum CTRL_TYPE_DEC       rotulo "Dec"
+        nba_model_wrapper.h -> enum CTRL_TYPE_NBA       rotulo "Nba"
+        outro.h              -> enum CTRL_TYPE_OUTRO     rotulo "Outro"
     """
     stem = Path(nome_arquivo_h).stem
     partes = [p for p in re.split(r"[_\-]+", stem) if p]
-    if len(partes) > 1 and partes[-1].lower() in SUFIXOS_ARQUIVO_IGNORADOS:
+    while len(partes) > 1 and partes[-1].lower() in SUFIXOS_ARQUIVO_IGNORADOS:
         partes = partes[:-1]
 
     enum = "CTRL_TYPE_" + "_".join(p.upper() for p in partes)
@@ -145,14 +146,28 @@ def ler_info_modelo(caminho_h, tipo_forcado=None):
     m = re.search(r"\bint\s+(\w+)_DecideLigarGPRS\s*\(", texto)
     if not m:
         raise ValueError(
-            f"'{caminho_h}' nao parece ter passado pelo wrapper "
+            f"'{caminho_h}' nao parece ter passado por nenhum dos wrappers "
             f"(prototipo '_DecideLigarGPRS' nao encontrado)."
         )
     info["prefixo"] = m.group(1)
 
+    # familia "pesado" (X-CUBE-AI): wrapper gerado pelo
+    # Adicionar_wrapper_xcubeai.py, com int {Prefixo}_Init(void) em vez das
+    # macros _NUM_INPUTS/_THRESHOLD/_NUM_OUTPUTS dos modelos do m2cgen.
+    if re.search(rf"\bint\s+{re.escape(info['prefixo'])}_Init\s*\(\s*void\s*\)", texto):
+        info["familia"] = "pesado"
+        info["macro"] = None
+        info["num_inputs"] = 2  # bateria_pct, taxa_normalizada - fixo no wrapper
+        info["tipo"] = tipo_forcado or "xcubeai"
+        info["enum"], info["rotulo"] = derivar_enum_e_rotulo(info["header"])
+        return info
+
     m = re.search(r"#define\s+([A-Z][A-Z0-9_]*)_NUM_INPUTS\s+(\d+)", texto)
     if not m:
-        raise ValueError(f"'{caminho_h}' nao define <PREFIXO>_NUM_INPUTS.")
+        raise ValueError(
+            f"'{caminho_h}' nao define <PREFIXO>_NUM_INPUTS nem tem "
+            f"'{info['prefixo']}_Init(void)' - nao reconheco esse formato de wrapper."
+        )
     info["macro"] = m.group(1)
     info["num_inputs"] = int(m.group(2))
 
@@ -219,6 +234,19 @@ def adicionar_include(texto_c, nome_h):
 def corpo_case(info):
     """Case do switch do InitController, conforme a familia do modelo."""
     enum, pref, macro = info["enum"], info["prefixo"], info["macro"]
+
+    if info["familia"] == "pesado":
+        return f"""        case {enum}:
+        {{
+            /* {info['header']} e uma rede X-CUBE-AI (bem mais pesada que os
+             * modelos do m2cgen): e stateful, entao "Inicializar" aqui aloca
+             * os buffers de ativacao e monta a rede antes do primeiro uso. */
+            ret = {pref}_Init();
+            ControllerReporter_ReportCreation({enum}, (ret == 0));
+            break;
+        }}
+"""
+
     init = ", ".join(["50.0"] * info["num_inputs"])
 
     if info["familia"] == "valor_unico":
@@ -382,8 +410,9 @@ def processar(modelo_h, args):
               f"{NOME_REPORTER_C} (Src/). Use --core ou --reporter-h/--reporter-c.")
         return False
 
+    macro_txt = f" / {info['macro']}_*" if info["macro"] else ""
     print(f"[{Path(modelo_h).name}]")
-    print(f"  - modelo: {info['prefixo']}_* / {info['macro']}_* "
+    print(f"  - modelo: {info['prefixo']}_*{macro_txt} "
           f"({info['tipo']}, {info['familia'].replace('_', ' ')}, "
           f"{info['num_inputs']} entradas)")
     print(f"  - enum: {info['enum']}   rotulo do log: \"{info['rotulo']}\"")

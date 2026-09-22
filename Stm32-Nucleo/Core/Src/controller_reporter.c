@@ -7,6 +7,9 @@
 #include "svm_model.h"
 #include "lgb_model.h"
 #include "rfr_model.h"
+#include "qda_model_wrapper.h"
+#include "nnw_model_wrapper.h"
+#include "nba_model_wrapper.h"
 
 int ControllerReporter_InitController(ControllerType type)
 {
@@ -94,6 +97,33 @@ int ControllerReporter_InitController(ControllerType type)
             ControllerReporter_ReportCreation(CTRL_TYPE_RFR, (ret == 0));
             break;
         }
+        case CTRL_TYPE_QDA:
+        {
+            /* qda_model_wrapper.h e uma rede X-CUBE-AI (bem mais pesada que os
+             * modelos do m2cgen): e stateful, entao "Inicializar" aqui aloca
+             * os buffers de ativacao e monta a rede antes do primeiro uso. */
+            ret = QdaModel_Init();
+            ControllerReporter_ReportCreation(CTRL_TYPE_QDA, (ret == 0));
+            break;
+        }
+        case CTRL_TYPE_NNW:
+        {
+            /* nnw_model_wrapper.h e uma rede X-CUBE-AI (bem mais pesada que os
+             * modelos do m2cgen): e stateful, entao "Inicializar" aqui aloca
+             * os buffers de ativacao e monta a rede antes do primeiro uso. */
+            ret = NnwModel_Init();
+            ControllerReporter_ReportCreation(CTRL_TYPE_NNW, (ret == 0));
+            break;
+        }
+        case CTRL_TYPE_NBA:
+        {
+            /* nba_model_wrapper.h e uma rede X-CUBE-AI (bem mais pesada que os
+             * modelos do m2cgen): e stateful, entao "Inicializar" aqui aloca
+             * os buffers de ativacao e monta a rede antes do primeiro uso. */
+            ret = NbaModel_Init();
+            ControllerReporter_ReportCreation(CTRL_TYPE_NBA, (ret == 0));
+            break;
+        }
         default:
             ControllerReporter_ReportCreation(CTRL_TYPE_OTHER, 0);
             ret = -1;
@@ -112,6 +142,9 @@ void ControllerReporter_ReportCreation(ControllerType type, int success)
         case CTRL_TYPE_DECISION_TREE: name = "DecisionTree"; break;
         case CTRL_TYPE_LGB: name = "Lgb"; break;
         case CTRL_TYPE_RFR: name = "Rfr"; break;
+        case CTRL_TYPE_QDA: name = "Qda"; break;
+        case CTRL_TYPE_NNW: name = "Nnw"; break;
+        case CTRL_TYPE_NBA: name = "Nba"; break;
         default: name = "OtherController"; break;
     }
 
