@@ -1,12 +1,20 @@
 import serial
 import csv
 import time
+import sys
 
-nome_arquivo: str= 'Data/stm32report/dados3.csv' # aqui você define a localização do arquivo de dados criado #
-baud_rate: int = 115200         # taxa baud do monitor serial que deve ser definida: Arduino-9600, Stm32-115200 #
-com_port: str = 'COM7'          # Definição de qual porta COM o controlador está conectado #
-col_count: int = 5              # Definição de quantas colunas de dados será impressa no monitor serial:
-                                # - fuzzydata -> 27 ; stm32report -> 5 #
+# Valor padrão caso nenhum argumento seja passado pelo terminal
+nome_arquivo_padrao: str = 'Data/stm32report/unidentified_model-1.csv'
+
+# Se um argumento for fornecido na linha de comando, usa ele; caso contrário, usa o valor padrão
+if len(sys.argv) > 1:
+    nome_arquivo: str = sys.argv[1]
+else:
+    nome_arquivo: str = nome_arquivo_padrao
+
+baud_rate: int = 115200         # taxa baud do monitor serial que deve ser definida: Arduino-9600, Stm32-115200
+com_port: str = 'COM7'          # Definição de qual porta COM o controlador está conectado
+col_count: int = 5              # Definição de quantas colunas de dados será impressa no monitor serial
 
 def main():
 

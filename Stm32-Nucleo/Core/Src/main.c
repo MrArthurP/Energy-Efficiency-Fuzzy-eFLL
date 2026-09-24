@@ -199,7 +199,7 @@ int main(void)
       ControllerProfiler_MedirEReportar("QDA",            QdaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("NNW",            NnwModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-    
+
     } 
 
     /* USER CODE BEGIN 3 */
