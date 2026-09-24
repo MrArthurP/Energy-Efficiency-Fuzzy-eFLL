@@ -63,6 +63,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     Ai-Models/Core/Inc
+    Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/Inc
     tools/STM32Tools/stedgeai/targets/common/EmbedNets/tools/inspector/workspace/include
 
     # Biblioteca Fuzzy (arquivos .h)
@@ -80,6 +81,8 @@ list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
+    "${CMAKE_CURRENT_SOURCE_DIR}/Packs/STMicroelectronics/X-CUBE-AI/10.2.1/Middlewares/ST/AI/Lib/GCC/ARMCortexM4/NetworkRuntime1020_CM4_GCC.a"
+    m
 
     # Add user defined libraries
 )

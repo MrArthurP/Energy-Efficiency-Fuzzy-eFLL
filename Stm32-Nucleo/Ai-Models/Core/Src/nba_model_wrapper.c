@@ -30,7 +30,6 @@ static ai_float s_nba_model_in[2];
 static int32_t s_nba_model_out1[1];
 static float s_nba_model_out2[4];
 
-
 int NbaModel_Init(void)
 {
     const ai_handle ativacoes[] = { s_nba_model_activations };
