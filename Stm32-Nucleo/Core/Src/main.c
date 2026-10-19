@@ -167,7 +167,7 @@ int main(void)
   ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("QDA",            QdaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("NNW",            NnwModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-  ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  //ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   
   /* USER CODE END 2 */
 
@@ -182,7 +182,7 @@ int main(void)
     if (index < 300) {
       
       index++;
-
+      srand(HAL_GetTick());
       bateria_pct = 100 - (index * passo); /* valor da bateria começando em 100 e acabando em 0 */
       taxa_normalizada = rand() % 100; /* valor da taxa de sinal aleatória entre 0-100 */ 
 
@@ -198,7 +198,7 @@ int main(void)
       ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("QDA",            QdaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("NNW",            NnwModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
-      ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      //ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
 
     } 
 
