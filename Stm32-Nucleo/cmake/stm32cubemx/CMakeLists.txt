@@ -43,6 +43,9 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/rfr_model.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/svm_model.c
 
+    # Modelos de Machine Learning via script dedicado
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/knn_model.c
+
     # Modelos de Machine Learning via stm32ai onnx
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nnw_model.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Ai-Models/Core/Src/nnw_model_data.c
