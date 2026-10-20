@@ -1,5 +1,6 @@
 # modelos de machine learning
 Stm32-Nucleo/modelos_onnx/*.onnx
+Stm32-Nucleo/modelos_joblib/*.joblib
 
 # arquivos gerados pelo modelo onnx
 Stm32-Nucleo/st_ai_output/**
