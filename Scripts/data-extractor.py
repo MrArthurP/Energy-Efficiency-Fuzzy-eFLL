@@ -14,6 +14,7 @@ modelos_esperados: tuple[str, ...] = (
     'RFR',
     'QDA',
     'NNW',
+    'KNN',
 )
 modelos_por_execucao: int = len(modelos_esperados)
 registros_esperados: int = execucoes_esperadas * modelos_por_execucao
