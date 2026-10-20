@@ -31,6 +31,7 @@
 #include "svm_model.h"
 #include "lgb_model.h"
 #include "rfr_model.h"
+#include "knn_model.h"
 #include "qda_model_wrapper.h"
 #include "nnw_model_wrapper.h"
 #include "nba_model_wrapper.h"
@@ -167,6 +168,7 @@ int main(void)
   ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("QDA",            QdaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   ControllerProfiler_MedirEReportar("NNW",            NnwModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+  ControllerProfiler_MedirEReportar("KNN",            KnnModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   //ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
   
   /* USER CODE END 2 */
@@ -198,6 +200,7 @@ int main(void)
       ControllerProfiler_MedirEReportar("RFR",            RfrModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("QDA",            QdaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       ControllerProfiler_MedirEReportar("NNW",            NnwModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
+      ControllerProfiler_MedirEReportar("KNN",            KnnModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
       //ControllerProfiler_MedirEReportar("NBA",            NbaModel_DecideLigarGPRS, bateria_pct, taxa_normalizada, index);
 
     } 
