@@ -16,6 +16,7 @@ modelos_esperados: tuple[str, ...] = (
     'NNW',
     'KNN',
 )
+
 modelos_por_execucao: int = len(modelos_esperados)
 registros_esperados: int = execucoes_esperadas * modelos_por_execucao
 timeout_inatividade: int = 15
@@ -31,7 +32,7 @@ else:
 
 baud_rate: int = 115200         # taxa baud do monitor serial que deve ser definida: Arduino-9600, Stm32-115200
 com_port: str = 'COM7'          # Definição de qual porta COM o controlador está conectado
-col_count: int = 5              # Definição de quantas colunas de dados será impressa no monitor serial
+col_count: int = 8              # Definição de quantas colunas de dados será impressa no monitor serial
 
 def main():
 
