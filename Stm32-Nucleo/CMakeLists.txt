@@ -33,6 +33,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 project(${CMAKE_PROJECT_NAME} LANGUAGES C CXX)
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
+find_package(Python3 3.8 COMPONENTS Interpreter REQUIRED)
+
 # Enable CMake support for ASM, C and C++ languages
 enable_language(C ASM)
 enable_language(CXX)
@@ -85,4 +87,13 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     m
 
     # Add user defined libraries
+)
+
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND Python3::Interpreter
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/report_model_memory.py"
+        --map "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map"
+        --output "${CMAKE_BINARY_DIR}/model_memory_report.txt"
+    BYPRODUCTS "${CMAKE_BINARY_DIR}/model_memory_report.txt"
+    VERBATIM
 )

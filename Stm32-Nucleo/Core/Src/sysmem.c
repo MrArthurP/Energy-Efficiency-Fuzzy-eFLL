@@ -25,10 +25,24 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "memory_monitor.h"
+
 /**
  * Pointer to the current high watermark of the heap usage
  */
 static uint8_t *__sbrk_heap_end = NULL;
+
+size_t MemoryMonitor_GetHeapUsage(void)
+{
+  extern uint8_t _end;
+
+  if (__sbrk_heap_end == NULL)
+  {
+    return 0U;
+  }
+
+  return (size_t)((uintptr_t)__sbrk_heap_end - (uintptr_t)&_end);
+}
 
 /**
  * @brief _sbrk() allocates memory to the newlib heap and is used by malloc

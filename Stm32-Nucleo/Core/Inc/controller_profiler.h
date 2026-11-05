@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * Ponteiro de função com a assinatura comum aos wrappers de decisão de
@@ -29,6 +30,10 @@ typedef struct {
     uint32_t ciclos;    /* ciclos de clock consumidos pela chamada */
     float    tempo_us;  /* tempo estimado em microssegundos (baseado em SystemCoreClock) */
     int      decisao;   /* valor retornado pela função medida (1 = ligar, 0 = não ligar) */
+    size_t   stack_peak_bytes;   /* pico de stack usado durante a chamada */
+    ptrdiff_t heap_growth_bytes; /* variação do heap durante a chamada */
+    size_t   heap_reserved_bytes; /* heap reservado no fim da chamada */
+    int      stack_limit_reached; /* indica que a medição alcançou o limite reservado */
 } ControllerProfilerResult;
 
 /**
@@ -41,8 +46,7 @@ void ControllerProfiler_Init(void);
 
 /**
  * @brief  Executa `fn(bateria_pct, taxa_normalizada)` medindo o número de
- *         ciclos de clock consumidos, via DWT->CYCCNT (equivalente ao
- *         get_cycles original chamado antes/depois da chamada).
+ * ciclos de clock e pico de RAM temporaria (stack e heap) consumidos.
  * @note   DWT->CYCCNT é um contador de 32 bits que dá overflow (~poucos
  *         segundos em clocks de dezenas/centenas de MHz). A subtração
  *         `fim - inicio` em aritmética unsigned trata o overflow
